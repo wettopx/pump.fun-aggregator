@@ -1,0 +1,1608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google" content="notranslate">
+    <title>Documentation - disk.fun</title>
+    <link rel="icon" type="image/x-icon" href="/fav.ico">
+    <link rel="stylesheet" href="https://unpkg.com/98.css">
+    <style>
+        @font-face {
+            font-family: 'Sora';
+            src: url('/sora.woff2') format('woff2');
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000000;
+            font-family: 'Sora', 'MS Sans Serif', sans-serif;
+            color: #00ff00;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Matrix rain effect - simplified */
+        #matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.15;
+            z-index: 0;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.9);
+            border-bottom: 1px solid #00ff00;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            height: 40px;
+            width: auto;
+            cursor: pointer;
+        }
+
+        .social-icons {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-left: 15px;
+        }
+
+        .social-icon {
+            height: 24px;
+            width: 24px;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+
+        .social-icon:hover {
+            opacity: 1;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background: #000000;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+            font-family: 'Sora', sans-serif;
+            display: inline-block;
+            font-weight: 500;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            outline: none !important;
+        }
+
+        .btn:hover {
+            background: #001100;
+            box-shadow: none !important;
+        }
+
+        .btn:active {
+            box-shadow: none !important;
+            border: 1px solid #00ff00 !important;
+        }
+
+        .wallet-info {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #00ff00;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            font-size: 30px;
+            line-height: 1;
+            color: #00ff00;
+            cursor: pointer;
+            margin-left: auto;
+            padding: 0;
+            background: none;
+            border: none;
+            font-family: monospace;
+        }
+
+        .mobile-menu-btn:hover {
+            opacity: 0.8;
+        }
+
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.95);
+            border: 1px solid #00ff00;
+            padding: 20px;
+            z-index: 1001;
+            min-width: 200px;
+        }
+
+        .mobile-menu.active {
+            display: block;
+        }
+
+        .mobile-menu a,
+        .mobile-menu button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            text-align: left;
+            background: transparent;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            text-decoration: none;
+            font-family: 'Sora', sans-serif;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .mobile-menu a:hover,
+        .mobile-menu button:hover {
+            background: #001100;
+        }
+
+        /* Documentation Layout */
+        .docs-container {
+            display: flex;
+            padding-top: 80px;
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            padding: 20px;
+            border-right: 1px solid #00ff00;
+            height: calc(100vh - 80px);
+            overflow-y: auto;
+            position: sticky;
+            top: 80px;
+        }
+
+        .sidebar-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #00ff00;
+        }
+
+        .nav-section {
+            margin-bottom: 25px;
+        }
+
+        .nav-section-title {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            opacity: 0.7;
+            text-transform: uppercase;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 8px 16px;
+            color: #00ff00;
+            text-decoration: none;
+            font-size: 14px;
+            border-left: 2px solid transparent;
+            margin-bottom: 5px;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover {
+            background: rgba(0, 255, 0, 0.1);
+            border-left-color: #00ff00;
+        }
+
+        .nav-link.active {
+            background: rgba(0, 255, 0, 0.1);
+            border-left-color: #00ff00;
+            font-weight: bold;
+        }
+
+        /* Content */
+        .content {
+            flex: 1;
+            padding: 40px;
+            max-width: 800px;
+        }
+
+        .content h1 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: #00ff00;
+            border-bottom: 2px solid #00ff00;
+            padding-bottom: 10px;
+        }
+
+        .content h2 {
+            font-size: 28px;
+            margin: 40px 0 20px 0;
+            color: #00ff00;
+        }
+
+        .content h3 {
+            font-size: 20px;
+            margin: 30px 0 15px 0;
+            color: #00ff00;
+        }
+
+        .content p {
+            line-height: 1.8;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .content ul, .content ol {
+            margin-bottom: 20px;
+            padding-left: 30px;
+        }
+
+        .content li {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .content code {
+            background: rgba(0, 255, 0, 0.1);
+            padding: 2px 6px;
+            font-family: 'Courier New', monospace;
+            border: 1px solid #00ff00;
+        }
+
+        .content pre {
+            background: rgba(0, 255, 0, 0.05);
+            border: 1px solid #00ff00;
+            padding: 20px;
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+
+        .content pre code {
+            background: none;
+            border: none;
+            padding: 0;
+        }
+
+        /* Fixed table styles for black background */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: #000000 !important;
+        }
+
+        th, td {
+            border: 1px solid #00ff00 !important;
+            padding: 10px 15px !important;
+            text-align: left;
+            background: #000000 !important;
+            color: #00ff00 !important;
+        }
+
+        th {
+            font-weight: bold;
+            background: rgba(0, 255, 0, 0.1) !important;
+        }
+
+        tr:hover td {
+            background: rgba(0, 255, 0, 0.05) !important;
+        }
+
+        .highlight-box {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid #00ff00;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .warning-box {
+            background: rgba(255, 255, 0, 0.1);
+            border: 1px solid #ffff00;
+            padding: 20px;
+            margin: 20px 0;
+            color: #ffff00;
+        }
+
+        .info-box {
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid #00ffff;
+            padding: 20px;
+            margin: 20px 0;
+            color: #00ffff;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .feature-card {
+            background: rgba(0, 255, 0, 0.05);
+            border: 1px solid #00ff00;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            background: rgba(0, 255, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .feature-card h4 {
+            color: #00ff00;
+            margin-bottom: 10px;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .header-right {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body translate="no">
+    <!-- Matrix Background -->
+    <canvas id="matrix-bg"></canvas>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <img src="/disk-logo.svg" alt="disk.fun" class="logo" onclick="window.location.href='/'">
+                <div class="social-icons">
+                    <a href="https://x.com/diskdotfun" target="_blank" rel="noopener noreferrer">
+                        <img src="/x.svg" alt="Twitter" class="social-icon">
+                    </a>
+                    <a href="https://discord.gg/diskfun" target="_blank" rel="noopener noreferrer">
+                        <img src="/dc.svg" alt="Discord" class="social-icon">
+                    </a>
+                </div>
+            </div>
+            <div class="header-right">
+                <span id="wallet-info" class="wallet-info hidden"></span>
+                <a href="/" class="btn">Home</a>
+                <a href="/lb.html" class="btn">Leaderboard</a>
+                <a href="/game.html" class="btn">S.I.G</a>
+                <a href="/mp.html" class="btn">Marketplace</a>
+                <a href="/create.html" class="btn">Create Coin</a>
+                <button id="connect-btn" class="btn">Connect Phantom</button>
+            </div>
+            <div class="mobile-menu-btn" id="mobile-menu-btn">≡</div>
+        </div>
+        <div class="mobile-menu" id="mobile-menu">
+            <span id="mobile-wallet-info" class="wallet-info hidden"></span>
+            <a href="/">Home</a>
+            <a href="/lb.html">Leaderboard</a>
+            <a href="/game.html">S.I.G</a>
+            <a href="/mp.html">Marketplace</a>
+            <a href="/create.html">Create Coin</a>
+            <button id="mobile-connect-btn">Connect Phantom</button>
+        </div>
+    </header>
+
+    <div class="docs-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-title">DOCUMENTATION</div>
+            
+            <div class="nav-section">
+                <div class="nav-section-title">Getting Started</div>
+                <a href="#introduction" class="nav-link active">Introduction</a>
+                <a href="#what-is-diskfun" class="nav-link">What is disk.fun?</a>
+                <a href="#why-diskfun" class="nav-link">Why disk.fun?</a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Token Launches</div>
+                <a href="#classic-launches" class="nav-link">Classic Launches</a>
+                <a href="#infected-launches" class="nav-link">Infected Launches</a>
+                <a href="#launch-comparison" class="nav-link">Launch Comparison</a>
+                <a href="#dev-buy" class="nav-link">Dev Buy Feature</a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Features</div>
+                <a href="#leaderboard" class="nav-link">Leaderboard System</a>
+                <a href="#gaming" class="nav-link">Gaming Experience</a>
+                <a href="#marketplace" class="nav-link">Marketplace</a>
+                <a href="#socials" class="nav-link">Social Links</a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Technical</div>
+                <a href="#fees" class="nav-link">Fees & Economics</a>
+                <a href="#api" class="nav-link">API Reference</a>
+                <a href="#security" class="nav-link">Security</a>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Introduction Section -->
+            <section id="introduction" class="section active">
+                <h1>Welcome to disk.fun</h1>
+                
+                <p>The most innovative, gamified, and community-driven token launcher on Solana. Where creativity meets chaos, and every launch tells a story.</p>
+
+                <div class="highlight-box">
+                    <strong>Quick Start:</strong> Connect your Phantom wallet, choose between Classic or Infected launch, and create your token in seconds. It's that simple.
+                </div>
+
+                <h2>The Revolution Begins</h2>
+                
+                <p>In a world saturated with generic token launchers and pump-and-dump schemes, disk.fun emerges as a beacon of innovation. We're not just another aggregator – we're a complete ecosystem that gamifies the entire token creation experience.</p>
+
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4>Instant Launches</h4>
+                        <p>Create tokens in seconds with our streamlined interface. No complex forms, no waiting.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Virus Mechanics</h4>
+                        <p>Introducing infected tokens – censored names until launch, ultra-rare Bio prefix (0.1% chance).</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Gamification</h4>
+                        <p>Earn points, climb leaderboards, and play games while waiting for your next moon shot.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Matrix Aesthetic</h4>
+                        <p>Experience the future of DeFi through our unique cyberpunk-inspired interface.</p>
+                    </div>
+                </div>
+
+                <h2>Key Statistics</h2>
+                <ul>
+                    <li><strong>Service Fee:</strong> Only 0.04 SOL per launch</li>
+                    <li><strong>Launch Time:</strong> Under 30 seconds</li>
+                    <li><strong>Classic Tokens:</strong> 100 leaderboard points</li>
+                    <li><strong>Infected Tokens:</strong> 200 leaderboard points</li>
+                    <li><strong>Max Dev Buy:</strong> 2 SOL</li>
+                    <li><strong>Bio Prefix Rarity:</strong> 0.1% (1 in 1000)</li>
+                </ul>
+            </section>
+
+            <!-- What is disk.fun Section -->
+            <section id="what-is-diskfun" class="section">
+                <h1>What is disk.fun?</h1>
+
+                <p>disk.fun is a next-generation token launcher built on Solana that combines the thrill of meme coin creation with gaming elements and viral mechanics. We've taken everything boring about traditional launchers and injected it with pure, concentrated fun.</p>
+
+                <h2>Core Philosophy</h2>
+
+                <p>We believe that token creation should be:</p>
+                <ul>
+                    <li><strong>Accessible:</strong> Anyone can create a token with just 0.04 SOL</li>
+                    <li><strong>Entertaining:</strong> Why be boring when you can have fun?</li>
+                    <li><strong>Unpredictable:</strong> Infected tokens add an element of chaos</li>
+                    <li><strong>Community-Driven:</strong> Leaderboards and games create engagement</li>
+                    <li><strong>Fair:</strong> No hidden fees, no rugpulls, just pure launches</li>
+                </ul>
+
+                <h2>The disk.fun Ecosystem</h2>
+
+                <h3>1. Token Launcher</h3>
+                <p>Our core product - create Classic or Infected tokens with a sleek, matrix-themed interface. Every token launched through disk.fun becomes part of our growing ecosystem.</p>
+
+                <h3>2. Leaderboard System</h3>
+                <p>Track your progress, compete with others, and earn recognition. Points are awarded for:</p>
+                <ul>
+                    <li>Classic token launches (100 points)</li>
+                    <li>Infected token launches (200 points)</li>
+                    <li>Future: Game achievements and trading volume</li>
+                </ul>
+
+                <h3>3. Gaming Platform</h3>
+                <p>Take a break from charts with our built-in games. Currently featuring Space Invaders Gamified (S.I.G), with more games coming soon.</p>
+
+                <h3>4. Marketplace (Coming Soon)</h3>
+                <p>Trade, swap, and discover tokens within the disk.fun ecosystem. Our marketplace will feature unique mechanics tailored to our viral token system.</p>
+
+                <div class="info-box">
+                    <strong>Did you know?</strong> disk.fun was created by degens, for degens. We understand the culture because we ARE the culture.
+                </div>
+            </section>
+
+            <!-- Why disk.fun Section -->
+            <section id="why-diskfun" class="section">
+                <h1>Why disk.fun?</h1>
+
+                <p>In a sea of copy-paste token launchers, disk.fun stands alone. Here's why we're better than every other aggregator:</p>
+
+                <h2>Unique Value Propositions</h2>
+
+                <h3>1. Virus Infected Tokens</h3>
+                <p>No other launcher has this. Infected tokens are randomly generated with virus-themed names and imagery, adding an element of surprise and virality to your launches. It's Russian roulette meets token creation.</p>
+
+                <h3>2. Gamified Experience</h3>
+                <p>While others offer boring forms and generic interfaces, we provide:</p>
+                <ul>
+                    <li>Matrix rain effects that respond to your actions</li>
+                    <li>Typing animations and sound effects</li>
+                    <li>Built-in games for entertainment</li>
+                    <li>Achievement system (coming soon)</li>
+                </ul>
+
+                <h3>3. True Community Focus</h3>
+                <p>Our leaderboard isn't just a vanity metric – it's a living, breathing representation of our most active creators. Future updates will include:</p>
+                <ul>
+                    <li>Creator profiles and portfolios</li>
+                    <li>Token performance tracking</li>
+                    <li>Social features and messaging</li>
+                    <li>DAO governance for platform decisions</li>
+                </ul>
+
+                <h3>4. Aesthetic Excellence</h3>
+                <p>Let's be honest – other launchers look like they were designed in 2017. Our matrix-inspired design isn't just for show:</p>
+                <ul>
+                    <li>Reduces eye strain during late-night degen sessions</li>
+                    <li>Creates a unique brand identity</li>
+                    <li>Makes you feel like a hacker while launching tokens</li>
+                    <li>Screenshots look amazing on Twitter</li>
+                </ul>
+
+                <h3>5. Technical Superiority</h3>
+                <table>
+                    <tr>
+                        <th>Feature</th>
+                        <th>disk.fun</th>
+                        <th>Others</th>
+                    </tr>
+                    <tr>
+                        <td>Launch Speed</td>
+                        <td>< 30 seconds</td>
+                        <td>2-5 minutes</td>
+                    </tr>
+                    <tr>
+                        <td>Service Fee</td>
+                        <td>0.04 SOL</td>
+                        <td>0.02-0.05 SOL</td>
+                    </tr>
+                    <tr>
+                        <td>Infected Tokens</td>
+                        <td>✅ Yes</td>
+                        <td>❌ No</td>
+                    </tr>
+                    <tr>
+                        <td>Built-in Games</td>
+                        <td>✅ Yes</td>
+                        <td>❌ No</td>
+                    </tr>
+                    <tr>
+                        <td>Leaderboard</td>
+                        <td>✅ Yes</td>
+                        <td>❌ No</td>
+                    </tr>
+                    <tr>
+                        <td>Dev Buy Option</td>
+                        <td>✅ Yes (up to 2 SOL)</td>
+                        <td>❌ No</td>
+                    </tr>
+                    <tr>
+                        <td>Social Links</td>
+                        <td>✅ Yes</td>
+                        <td>❌ Limited</td>
+                    </tr>
+                </table>
+
+                <div class="warning-box">
+                    <strong>Warning:</strong> Once you experience disk.fun, other launchers will feel prehistoric. Side effects may include: excessive fun, viral token addiction, and an irresistible urge to climb the leaderboard.
+                </div>
+            </section>
+
+            <!-- Classic Launches Section -->
+            <section id="classic-launches" class="section">
+                <h1>Classic Launches</h1>
+
+                <p>The traditional way to create tokens, but with the disk.fun twist. Classic launches give you full control over your token's identity.</p>
+
+                <h2>How It Works</h2>
+
+                <ol>
+                    <li><strong>Connect Wallet:</strong> Link your Phantom wallet to get started</li>
+                    <li><strong>Choose Classic:</strong> Select the Classic tab in the launcher</li>
+                    <li><strong>Enter Details:</strong>
+                        <ul>
+                            <li>Token Name (up to 32 characters)</li>
+                            <li>Token Symbol (up to 10 characters)</li>
+                            <li>Upload Image (JPG/PNG, max 5MB)</li>
+                            <li>Add social links (optional)</li>
+                            <li>Set dev buy amount (optional, max 2 SOL)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Pay Fee:</strong> 0.04 SOL service fee + gas</li>
+                    <li><strong>Launch:</strong> Your token goes live on pump.fun instantly</li>
+                </ol>
+
+                <h2>Classic Benefits</h2>
+
+                <ul>
+                    <li>✅ Full creative control</li>
+                    <li>✅ Custom branding</li>
+                    <li>✅ Professional appearance</li>
+                    <li>✅ 100 leaderboard points</li>
+                    <li>✅ Perfect for serious projects</li>
+                    <li>✅ Social media integration</li>
+                    <li>✅ Dev buy option for initial liquidity</li>
+                </ul>
+
+                <h2>Best Practices</h2>
+
+                <div class="highlight-box">
+                    <h4>Pro Tips for Classic Launches:</h4>
+                    <ul>
+                        <li>Use high-quality images (minimum 512x512)</li>
+                        <li>Keep names memorable and easy to type</li>
+                        <li>Symbols should be 3-5 characters for best recognition</li>
+                        <li>Check pump.fun for existing similar names</li>
+                        <li>Have your marketing ready before launch</li>
+                        <li>Consider a small dev buy (0.1-0.5 SOL) to show commitment</li>
+                        <li>Add all social links to build trust</li>
+                    </ul>
+                </div>
+
+                <pre><code>Example Classic Token:
+Name: "Quantum Capybara"
+Symbol: "QCAPY"
+Image: [Your custom capybara artwork]
+Twitter: https://x.com/quantumcapy
+Telegram: https://t.me/quantumcapy
+Website: https://quantumcapybara.com
+Dev Buy: 0.5 SOL
+Result: Professional token with strong branding
+
+Note: Unlike infected tokens, classic names are 
+visible during creation - no censorship!</code></pre>
+            </section>
+
+            <!-- Infected Launches Section -->
+            <section id="infected-launches" class="section">
+                <h1>Infected Launches</h1>
+
+                <p>Welcome to the dark side of token creation. Infected launches are disk.fun's signature feature – unpredictable, viral, and absolutely chaotic.</p>
+
+                <h2>The Virus Mechanism</h2>
+
+                <p>When you launch an infected token:</p>
+                <ol>
+                    <li>Names and symbols are <strong>randomly generated</strong> using AI</li>
+                    <li>Identity remains <strong>censored with glitch text</strong> until launch</li>
+                    <li>Images are selected from our infected asset collection based on rarity</li>
+                    <li>Each launch is unique and unpredictable</li>
+                    <li>200 leaderboard points awarded (2x Classic)</li>
+                </ol>
+
+                <h2>Infected Token Rarity System</h2>
+
+                <table>
+                    <tr>
+                        <th>Prefix</th>
+                        <th>Rarity</th>
+                        <th>Image Pool</th>
+                        <th>Occurrence Rate</th>
+                    </tr>
+                    <tr>
+                        <td>Bio</td>
+                        <td>Legendary</td>
+                        <td>1 unique GIF</td>
+                        <td>0.1%</td>
+                    </tr>
+                    <tr>
+                        <td>Net</td>
+                        <td>Epic</td>
+                        <td>3 GIFs</td>
+                        <td>0.9%</td>
+                    </tr>
+                    <tr>
+                        <td>Neo</td>
+                        <td>Rare</td>
+                        <td>4 GIFs</td>
+                        <td>4%</td>
+                    </tr>
+                    <tr>
+                        <td>Gero</td>
+                        <td>Common</td>
+                        <td>6 GIFs</td>
+                        <td>95%</td>
+                    </tr>
+                </table>
+
+                <h2>AI Name Generation</h2>
+                <p>Infected token names are generated using Hugging Face AI with intelligent uniqueness checking:</p>
+                <ul>
+                    <li>Advanced algorithm ensures no duplicates among last 100 infected tokens</li>
+                    <li>Combines prefixes with creative suffixes (no numbers added)</li>
+                    <li>Over 100 unique suffixes including: tech, virus, glitch, phantom, daemon, and more</li>
+                    <li>Examples: Biomega, Bioflux, Geronexus, Netphantom, Neodaemon</li>
+                    <li>Symbols use full suffix (e.g., Geronexus = NEXUS, not NEXU)</li>
+                    <li>Names remain censored with glitch text until after launch</li>
+                    <li>The excitement is in not knowing what you'll get!</li>
+                </ul>
+
+                <h2>Why Launch Infected?</h2>
+
+                <ul>
+                    <li><strong>Embrace Chaos:</strong> Let fate decide your token's identity</li>
+                    <li><strong>Mystery Factor:</strong> Names stay censored until launch - pure suspense!</li>
+                    <li><strong>Viral Potential:</strong> Infected tokens often gain cult followings</li>
+                    <li><strong>Double Points:</strong> 200 points vs 100 for Classic</li>
+                    <li><strong>Unique Aesthetic:</strong> Stand out with virus-themed branding</li>
+                    <li><strong>Rarity Game:</strong> Try to get the legendary Bio prefix (0.1% chance)</li>
+                </ul>
+
+                <div class="warning-box">
+                    <strong>Infection Warning:</strong> Once you launch your first infected token, there's no going back. The virus spreads through your wallet, your portfolio, and your soul. Proceed with caution.
+                </div>
+
+                <h2>The Infected Philosophy</h2>
+
+                <p>Infected tokens represent the chaotic nature of meme coins. By removing control from the creator, we embrace the true spirit of decentralization – nobody knows what will happen next.</p>
+
+                <pre><code>Example Infected Generation:
+[Click Launch Infected Token]
+Display shows: "████████" (censored)
+Symbol shows: "██████" (censored)
+Rarity shows: "Common/Rare/Epic/Legendary"
+
+After launch reveals:
+Name: "Geronexus" 
+Symbol: "NEXUS"
+Image: [Common Gero virus GIF]
+Result: Pure chaos unleashed</code></pre>
+            </section>
+
+            <!-- Launch Comparison Section -->
+            <section id="launch-comparison" class="section">
+                <h1>Launch Comparison</h1>
+
+                <p>Choosing between Classic and Infected? Here's a detailed comparison to help you decide:</p>
+
+                <h2>Side-by-Side Comparison</h2>
+
+                <table>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Classic Launch</th>
+                        <th>Infected Launch</th>
+                    </tr>
+                    <tr>
+                        <td>Token Name</td>
+                        <td>You choose</td>
+                        <td>Censored until launch</td>
+                    </tr>
+                    <tr>
+                        <td>Token Symbol</td>
+                        <td>You choose (max 10 chars)</td>
+                        <td>Censored (full suffix length)</td>
+                    </tr>
+                    <tr>
+                        <td>Image</td>
+                        <td>Custom upload</td>
+                        <td>Random virus asset</td>
+                    </tr>
+                    <tr>
+                        <td>Leaderboard Points</td>
+                        <td>100 points</td>
+                        <td>200 points</td>
+                    </tr>
+                    <tr>
+                        <td>Service Fee</td>
+                        <td>0.04 SOL</td>
+                        <td>0.04 SOL</td>
+                    </tr>
+                    <tr>
+                        <td>Control Level</td>
+                        <td>Full control</td>
+                        <td>Zero control</td>
+                    </tr>
+                    <tr>
+                        <td>Best For</td>
+                        <td>Serious projects</td>
+                        <td>Degen experiments</td>
+                    </tr>
+                    <tr>
+                        <td>Social Links</td>
+                        <td>Yes (optional)</td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td>Dev Buy</td>
+                        <td>Yes (up to 2 SOL)</td>
+                        <td>No</td>
+                    </tr>
+                    <tr>
+                        <td>Name Generation</td>
+                        <td>Manual</td>
+                        <td>AI-powered</td>
+                    </tr>
+                </table>
+
+                <h2>Decision Matrix</h2>
+
+                <h3>Choose Classic When:</h3>
+                <ul>
+                    <li>You have a specific vision for your token</li>
+                    <li>Building a community around a concept</li>
+                    <li>Need professional branding</li>
+                    <li>Want predictable results</li>
+                    <li>Creating utility tokens</li>
+                    <li>Planning to add social media presence</li>
+                    <li>Want to buy initial supply</li>
+                </ul>
+
+                <h3>Choose Infected When:</h3>
+                <ul>
+                    <li>You embrace chaos and randomness</li>
+                    <li>Want to maximize leaderboard points</li>
+                    <li>Love surprises and mystery</li>
+                    <li>Creating for fun, not profit</li>
+                    <li>Testing the viral potential</li>
+                    <li>Hunting for ultra-rare Bio prefix (0.1% chance)</li>
+                    <li>Enjoy the suspense of censored names</li>
+                </ul>
+
+                <div class="info-box">
+                    <strong>Strategy Tip:</strong> Many top creators use a hybrid approach – Classic for serious projects, Infected for experiments. This maximizes both portfolio diversity and leaderboard points.
+                </div>
+
+                <h2>Statistical Analysis</h2>
+
+                <p>Based on our data:</p>
+                <ul>
+                    <li>60% of launches are Classic</li>
+                    <li>40% are Infected</li>
+                    <li>Infected tokens have 3x higher viral coefficient</li>
+                    <li>Classic tokens have 2x higher average market cap</li>
+                    <li>Top 10 leaderboard users launch 70% Infected</li>
+                    <li>Bio prefix infected tokens have 10x engagement due to extreme rarity</li>
+                    <li>Only ~1 in 1000 infected tokens get the legendary Bio prefix</li>
+                </ul>
+            </section>
+
+            <!-- Dev Buy Section -->
+            <section id="dev-buy" class="section">
+                <h1>Dev Buy Feature</h1>
+
+                <p>The dev buy feature allows token creators to purchase an initial amount of their own token at launch, demonstrating commitment and providing initial liquidity.</p>
+
+                <h2>How Dev Buy Works</h2>
+
+                <ol>
+                    <li>Available only for Classic tokens</li>
+                    <li>Set amount during token creation (0-2 SOL)</li>
+                    <li>Automatically executed at token launch</li>
+                    <li>Tokens sent directly to creator's wallet</li>
+                    <li>Transaction included in launch confirmation</li>
+                </ol>
+
+                <h2>Benefits of Dev Buy</h2>
+
+                <ul>
+                    <li><strong>Show Commitment:</strong> Demonstrates faith in your project</li>
+                    <li><strong>Initial Liquidity:</strong> Ensures trading can begin immediately</li>
+                    <li><strong>Price Support:</strong> Creates initial buy pressure</li>
+                    <li><strong>Community Trust:</strong> Shows you're invested alongside holders</li>
+                </ul>
+
+                <h2>Dev Buy Best Practices</h2>
+
+                <div class="highlight-box">
+                    <h4>Recommended Dev Buy Amounts:</h4>
+                    <ul>
+                        <li><strong>0.1-0.25 SOL:</strong> Small commitment, testing waters</li>
+                        <li><strong>0.5 SOL:</strong> Moderate commitment, serious project</li>
+                        <li><strong>1 SOL:</strong> Strong commitment, high confidence</li>
+                        <li><strong>2 SOL:</strong> Maximum commitment, all-in approach</li>
+                    </ul>
+                </div>
+
+                <div class="warning-box">
+                    <strong>Note:</strong> Dev buy is non-refundable and carries the same risks as any token purchase. Only invest what you can afford to lose.
+                </div>
+            </section>
+
+            <!-- Leaderboard Section -->
+            <section id="leaderboard" class="section">
+                <h1>Leaderboard System</h1>
+
+                <p>The disk.fun leaderboard isn't just a scoreboard – it's a living testament to the most active and creative members of our community.</p>
+
+                <h2>Point System</h2>
+
+                <div class="highlight-box">
+                    <h4>Current Point Values:</h4>
+                    <ul>
+                        <li>Classic Token Launch: <strong>100 points</strong></li>
+                        <li>Infected Token Launch: <strong>200 points</strong></li>
+                        <li>Coming Soon: Game achievements, trading volume, community votes</li>
+                    </ul>
+                </div>
+
+                <h2>Leaderboard Benefits</h2>
+
+                <h3>Current Benefits:</h3>
+                <ul>
+                    <li>Eternal glory and recognition</li>
+                    <li>Special highlighting for your tokens</li>
+                    <li>Portfolio tracking and statistics</li>
+                    <li>Bragging rights in the community</li>
+                </ul>
+
+                <h3>Future Benefits (Roadmap):</h3>
+                <ul>
+                    <li>Weekly airdrops for top 100 players</li>
+                    <li>Revenue sharing from platform fees</li>
+                    <li>Custom profile badges and NFTs</li>
+                    <li>Early access to new features</li>
+                    <li>Governance voting power</li>
+                    <li>Exclusive infected token variants</li>
+                    <li>Special game power-ups</li>
+                </ul>
+
+                <h2>Climbing the Ranks</h2>
+
+                <p>Strategies for leaderboard dominance:</p>
+                <ol>
+                    <li><strong>Volume Strategy:</strong> Launch multiple tokens daily</li>
+                    <li><strong>Infected Focus:</strong> 2x points for embracing chaos</li>
+                    <li><strong>Quality + Quantity:</strong> Successful tokens may earn bonus points (coming soon)</li>
+                    <li><strong>Game Master:</strong> Future game achievements will boost your score</li>
+                    <li><strong>Community Builder:</strong> Social engagement metrics coming soon</li>
+                </ol>
+
+                <h2>Airdrop Program</h2>
+
+                <p>disk.fun will launch a token airdrop program:</p>
+                <ul>
+                    <li>Weekly distributions to top 100 leaderboard players</li>
+                    <li>Starting after public launch (not during beta)</li>
+                    <li>Amount based on leaderboard position and activity</li>
+                    <li>Additional bonuses for special achievements</li>
+                </ul>
+            </section>
+
+            <!-- Gaming Section -->
+            <section id="gaming" class="section">
+                <h1>Gaming Experience</h1>
+
+                <p>Why stare at charts when you can blast invaders? disk.fun's gaming platform provides entertainment between launches and during those long consolidation periods.</p>
+
+                <h2>Space Invaders Gamified (S.I.G)</h2>
+
+                <p>Our flagship game brings classic arcade action to the blockchain:</p>
+                <ul>
+                    <li>Classic controls with modern polish</li>
+                    <li>High score tracking (local storage)</li>
+                    <li>Retro sound effects</li>
+                    <li>Matrix-themed visuals</li>
+                    <li>Smooth 60 FPS gameplay</li>
+                </ul>
+
+                <h3>How to Play:</h3>
+                <ol>
+                    <li>Press SPACE to start</li>
+                    <li>Use ARROW KEYS to move</li>
+                    <li>Press SPACE to shoot</li>
+                    <li>Destroy all invaders before they reach you</li>
+                    <li>Score multiplies with each wave</li>
+                    <li>Different invader types give different points</li>
+                </ol>
+
+                <h3>Scoring System:</h3>
+                <table>
+                    <tr>
+                        <th>Invader Type</th>
+                        <th>Points</th>
+                        <th>Color</th>
+                    </tr>
+                    <tr>
+                        <td>Basic</td>
+                        <td>10</td>
+                        <td>Green</td>
+                    </tr>
+                    <tr>
+                        <td>Medium</td>
+                        <td>20</td>
+                        <td>Yellow</td>
+                    </tr>
+                    <tr>
+                        <td>Boss</td>
+                        <td>30</td>
+                        <td>Purple</td>
+                    </tr>
+                    <tr>
+                        <td>Wave Bonus</td>
+                        <td>100</td>
+                        <td>-</td>
+                    </tr>
+                </table>
+
+                <h2>Future Games (Roadmap)</h2>
+
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4>Token Snake</h4>
+                        <p>Collect tokens to grow your snake. Eat infected tokens for bonus points.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Degen Slots</h4>
+                        <p>Spin to win with token-themed slot machines. House edge goes to leaderboard winners.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Rug Runner</h4>
+                        <p>Endless runner where you dodge rugs and collect gems. Inspired by true events.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Token Wars</h4>
+                        <p>PvP battles using your launched tokens as characters. Stats based on market performance.</p>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <strong>Coming Soon:</strong> Game achievements will contribute to your leaderboard score. Start practicing now!
+                </div>
+            </section>
+
+            <!-- Marketplace Section -->
+            <section id="marketplace" class="section">
+                <h1>Marketplace (Coming Soon)</h1>
+
+                <p>The disk.fun marketplace will revolutionize how tokens are traded within our ecosystem.</p>
+
+                <h2>Planned Features</h2>
+
+                <h3>Token Gallery</h3>
+                <ul>
+                    <li>Browse all disk.fun launched tokens</li>
+                    <li>Filter by Classic/Infected</li>
+                    <li>Sort by performance metrics</li>
+                    <li>Creator portfolios</li>
+                    <li>Rarity rankings for infected tokens</li>
+                </ul>
+
+                <h3>Unique Trading Mechanics</h3>
+                <ul>
+                    <li><strong>Infection Spread:</strong> Trade infected tokens to "infect" classic ones</li>
+                    <li><strong>Combo System:</strong> Bonus rewards for collecting token sets</li>
+                    <li><strong>Time Decay:</strong> Some infected tokens mutate over time</li>
+                    <li><strong>Social Trading:</strong> Copy top leaderboard traders</li>
+                    <li><strong>Rarity Trading:</strong> Premium market for ultra-rare Bio tokens (0.1%)</li>
+                </ul>
+
+                <h3>Marketplace Games</h3>
+                <ul>
+                    <li>Token prediction markets</li>
+                    <li>Launch roulette</li>
+                    <li>Infection spread betting</li>
+                    <li>Creator battles</li>
+                    <li>Rarity hunts</li>
+                </ul>
+
+                <div class="warning-box">
+                    <strong>Note:</strong> The marketplace is under active development. Features may change based on community feedback and regulatory considerations.
+                </div>
+            </section>
+
+            <!-- Social Links Section -->
+            <section id="socials" class="section">
+                <h1>Social Links Integration</h1>
+
+                <p>Build trust and community engagement by adding social links to your Classic tokens.</p>
+
+                <h2>Supported Platforms</h2>
+
+                <ul>
+                    <li><strong>X/Twitter:</strong> Connect with the crypto community</li>
+                    <li><strong>Telegram:</strong> Build your token's chat community</li>
+                    <li><strong>Website:</strong> Showcase your project professionally</li>
+                </ul>
+
+                <h2>Adding Social Links</h2>
+
+                <ol>
+                    <li>Available only for Classic tokens</li>
+                    <li>Click "add social links" dropdown during creation</li>
+                    <li>Enter full URLs (https://...)</li>
+                    <li>All fields are optional</li>
+                    <li>Links appear on pump.fun token page</li>
+                </ol>
+
+                <h2>Best Practices</h2>
+
+                <div class="highlight-box">
+                    <h4>Social Media Tips:</h4>
+                    <ul>
+                        <li>Set up accounts before launching</li>
+                        <li>Use consistent branding across platforms</li>
+                        <li>Have initial content ready</li>
+                        <li>Assign community moderators</li>
+                        <li>Post launch announcement immediately</li>
+                    </ul>
+                </div>
+
+                <h2>URL Format Requirements</h2>
+
+                <table>
+                    <tr>
+                        <th>Platform</th>
+                        <th>Valid Format</th>
+                        <th>Example</th>
+                    </tr>
+                    <tr>
+                        <td>X/Twitter</td>
+                        <td>https://x.com/... or https://twitter.com/...</td>
+                        <td>https://x.com/diskdotfun</td>
+                    </tr>
+                    <tr>
+                        <td>Telegram</td>
+                        <td>https://t.me/...</td>
+                        <td>https://t.me/diskfunchat</td>
+                    </tr>
+                    <tr>
+                        <td>Website</td>
+                        <td>https://...</td>
+                        <td>https://disk.fun</td>
+                    </tr>
+                </table>
+            </section>
+
+            <!-- Fees Section -->
+            <section id="fees" class="section">
+                <h1>Fees & Economics</h1>
+
+                <p>Transparency is core to disk.fun. Here's exactly how our economics work:</p>
+
+                <h2>Fee Structure</h2>
+
+                <table>
+                    <tr>
+                        <th>Fee Type</th>
+                        <th>Amount</th>
+                        <th>Purpose</th>
+                    </tr>
+                    <tr>
+                        <td>Service Fee</td>
+                        <td>0.04 SOL</td>
+                        <td>Platform maintenance & development</td>
+                    </tr>
+                    <tr>
+                        <td>Network Gas</td>
+                        <td>~0.002 SOL</td>
+                        <td>Solana transaction fees</td>
+                    </tr>
+                    <tr>
+                        <td>pump.fun Fee</td>
+                        <td>Variable</td>
+                        <td>Underlying platform fee</td>
+                    </tr>
+                    <tr>
+                        <td>Dev Buy (Optional)</td>
+                        <td>0-2 SOL</td>
+                        <td>Initial token purchase</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Total Cost</strong></td>
+                        <td><strong>~0.042 SOL + Dev Buy</strong></td>
+                        <td><strong>All-in cost per launch</strong></td>
+                    </tr>
+                </table>
+
+                <h2>Fee Allocation</h2>
+
+                <p>Your 0.04 SOL service fee is used for:</p>
+                <ul>
+                    <li>30% - Server infrastructure and API costs</li>
+                    <li>25% - Development fund</li>
+                    <li>20% - Marketing and growth</li>
+                    <li>15% - Community rewards (coming soon)</li>
+                    <li>10% - Team allocation</li>
+                </ul>
+
+                <h2>Future Economics</h2>
+
+                <div class="highlight-box">
+                    <h4>disk.fun Token (Coming Soon)</h4>
+                    <p>We're planning to launch our own token with the following utilities:</p>
+                    <ul>
+                        <li>Fee discounts for holders</li>
+                        <li>Governance voting rights</li>
+                        <li>Revenue sharing from platform fees</li>
+                        <li>Exclusive infected variants</li>
+                        <li>Game power-ups and bonuses</li>
+                        <li>Access to private features</li>
+                        <li>Staking rewards</li>
+                    </ul>
+                </div>
+
+                <h2>Why Our Fees Are Lower</h2>
+
+                <p>Most launchers charge 0.02-0.05 SOL. We keep fees low because:</p>
+                <ul>
+                    <li>Efficient infrastructure reduces costs</li>
+                    <li>Volume-based business model</li>
+                    <li>Community-first approach</li>
+                    <li>Long-term vision over short-term profits</li>
+                    <li>Automated processes minimize overhead</li>
+                </ul>
+            </section>
+
+            <!-- API Section -->
+            <section id="api" class="section">
+                <h1>API Reference</h1>
+
+                <p>disk.fun provides public API endpoints for developers and integrators.</p>
+
+                <h2>Public Endpoints</h2>
+
+                <h3>Get All Tokens</h3>
+                <pre><code>GET /api/tokens
+
+Response:
+[
+  {
+    "mint": "44hupNoFHCgeNoojTE7XA9o5f6WeQfobddp5btz7pgGB",
+    "name": "Quantum Capybara",
+    "symbol": "QCAPY",
+    "isInfected": false,
+    "creator": "EbWLwrXbUoPCMDzWeKJiQ5mj3hhKtpbmxKhNkBX1Vf2",
+    "createdAt": "2025-05-28T06:34:21.187Z",
+    "imageUrl": "ipfs://...",
+    "price": 0.000123,
+    "marketCap": 12345,
+    "holders": 42,
+    "socials": {
+      "twitter": "https://x.com/quantumcapy",
+      "telegram": "https://t.me/quantumcapy",
+      "website": "https://quantumcapybara.com"
+    },
+    "devBuyAmount": 0.5
+  }
+]</code></pre>
+
+                <h3>Get Leaderboard</h3>
+                <pre><code>GET /api/leaderboard
+
+Response:
+[
+  {
+    "wallet": "EbWLwrXbUoPCMDzWeKJiQ5mj3hhKtpbmxKhNkBX1Vf2",
+    "totalTokens": 10,
+    "classicTokens": 4,
+    "infectedTokens": 6,
+    "points": 1600
+  }
+]</code></pre>
+
+                <h3>Generate Infected Name</h3>
+                <pre><code>GET /api/generate-infected-name
+
+Response:
+{
+  "name": "Biomega",
+  "symbol": "MEGA",
+  "prefix": "Bio",
+  "suffix": "mega"
+}</code></pre>
+
+                <h3>Debug Token Data</h3>
+                <pre><code>GET /api/debug/:mint
+
+Response:
+{
+  "mint": "...",
+  "pumpportal": { ... },
+  "pumpfun": { ... },
+  "detectedImageUrl": "...",
+  "processedImageUrl": "..."
+}</code></pre>
+
+                <h2>Rate Limits</h2>
+
+                <ul>
+                    <li>100 requests per minute per IP</li>
+                    <li>No authentication required for public endpoints</li>
+                    <li>Webhooks coming soon for real-time updates</li>
+                </ul>
+
+                <h2>WebSocket Events (Coming Soon)</h2>
+
+                <p>Real-time updates for:</p>
+                <ul>
+                    <li>New token launches</li>
+                    <li>Leaderboard changes</li>
+                    <li>Infected token mutations</li>
+                    <li>Game high scores</li>
+                </ul>
+
+                <div class="info-box">
+                    <strong>Developer Note:</strong> We're working on authenticated endpoints for creating tokens programmatically. Join our Discord for updates.
+                </div>
+            </section>
+
+            <!-- Security Section -->
+            <section id="security" class="section">
+                <h1>Security</h1>
+
+                <p>Your safety is our priority. Here's how we protect you:</p>
+
+                <h2>Platform Security</h2>
+
+                <h3>No Wallet Access</h3>
+                <ul>
+                    <li>We never ask for your private keys</li>
+                    <li>All transactions are signed in your wallet</li>
+                    <li>No backend wallet storage</li>
+                    <li>Open-source smart contracts (coming soon)</li>
+                </ul>
+
+                <h3>Data Protection</h3>
+                <ul>
+                    <li>No permanent file storage (images processed in memory)</li>
+                    <li>Minimal data collection</li>
+                    <li>No tracking or analytics (except basic metrics)</li>
+                    <li>All API calls use secure protocols</li>
+                    <li>Regular security audits</li>
+                </ul>
+
+                <h2>Token Security</h2>
+
+                <div class="warning-box">
+                    <strong>Important:</strong> disk.fun creates tokens on pump.fun. We are not responsible for token performance or pump.fun's security. Always DYOR (Do Your Own Research).
+                </div>
+
+                <h3>What We DON'T Do:</h3>
+                <ul>
+                    <li>❌ Hold liquidity</li>
+                    <li>❌ Control token contracts</li>
+                    <li>❌ Manage trading</li>
+                    <li>❌ Guarantee profits</li>
+                    <li>❌ Store private keys</li>
+                </ul>
+
+                <h3>What We DO:</h3>
+                <ul>
+                    <li>✅ Provide a fun, safe launching experience</li>
+                    <li>✅ Maintain platform security</li>
+                    <li>✅ Protect user data</li>
+                    <li>✅ Build cool features</li>
+                    <li>✅ Regular security updates</li>
+                </ul>
+
+                <h2>Best Practices</h2>
+
+                <ol>
+                    <li>Always verify transaction details before signing</li>
+                    <li>Use a dedicated wallet for token launches</li>
+                    <li>Never share your seed phrase</li>
+                    <li>Check pump.fun for token details after launch</li>
+                    <li>Report suspicious activity immediately</li>
+                    <li>Keep your browser and wallet updated</li>
+                    <li>Use hardware wallets for large transactions</li>
+                </ol>
+
+                <h2>Bug Bounty Program</h2>
+
+                <p>Help us improve security:</p>
+                <ul>
+                    <li>Report critical vulnerabilities: Up to 5 SOL reward</li>
+                    <li>Report medium issues: Up to 1 SOL reward</li>
+                    <li>Report minor issues: Up to 0.1 SOL reward</li>
+                </ul>
+
+                <div class="highlight-box">
+                    <strong>Security Contact:</strong> Found a vulnerability? Email security@disk.fun (coming soon) for responsible disclosure. Do not publicly disclose vulnerabilities.
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script type="module">
+        import { Connection, PublicKey } from "https://esm.sh/@solana/web3.js@1.95.0";
+
+        // Global state
+        let userWallet = localStorage.getItem('userWallet') || null;
+
+        // Create matrix rain effect
+        function createMatrixRain() {
+            const canvas = document.getElementById('matrix-bg');
+            const ctx = canvas.getContext('2d');
+
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const fontSize = 14;
+            const columns = canvas.width / fontSize;
+            const drops = [];
+
+            const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+
+            for(let x = 0; x < columns; x++) {
+                drops[x] = Math.random() * canvas.height;
+            }
+
+            function draw() {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                ctx.fillStyle = '#00ff00';
+                ctx.font = fontSize + 'px monospace';
+
+                for(let i = 0; i < drops.length; i++) {
+                    const text = chars[Math.floor(Math.random() * chars.length)];
+                    ctx.fillText(text, i * fontSize, drops[i]);
+
+                    if(drops[i] > canvas.height && Math.random() > 0.98) {
+                        drops[i] = 0;
+                    }
+                    drops[i] += fontSize;
+                }
+            }
+
+            setInterval(draw, 50);
+
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+        }
+
+        // Update wallet UI
+        function updateWalletUI() {
+            if (userWallet) {
+                document.getElementById("wallet-info").textContent = userWallet.slice(0, 4) + "..." + userWallet.slice(-4);
+                document.getElementById("wallet-info").classList.remove("hidden");
+                document.getElementById("connect-btn").textContent = "Connected";
+                
+                const mobileWalletInfo = document.getElementById("mobile-wallet-info");
+                if (mobileWalletInfo) {
+                    mobileWalletInfo.textContent = userWallet.slice(0, 4) + "..." + userWallet.slice(-4);
+                    mobileWalletInfo.classList.remove("hidden");
+                    document.getElementById("mobile-connect-btn").textContent = "Connected";
+                }
+            }
+        }
+
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('active');
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            
+            if (!mobileMenu.contains(event.target) && !mobileMenuBtn.contains(event.target)) {
+                mobileMenu.classList.remove('active');
+            }
+        });
+
+        // Connect wallet
+        async function connectWallet() {
+            try {
+                if (!window.solana) {
+                    alert("Please install Phantom wallet");
+                    window.open("https://phantom.app/", "_blank");
+                    return;
+                }
+
+                const response = await window.solana.connect();
+                userWallet = response.publicKey.toString();
+                
+                localStorage.setItem('userWallet', userWallet);
+                updateWalletUI();
+
+            } catch (error) {
+                console.error("Connection error:", error);
+                alert("Failed to connect wallet");
+            }
+        }
+
+        document.getElementById('connect-btn').addEventListener('click', connectWallet);
+        document.getElementById('mobile-connect-btn').addEventListener('click', connectWallet);
+
+        // Navigation handling
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('.section');
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                // Remove active class from all links and sections
+                navLinks.forEach(l => l.classList.remove('active'));
+                sections.forEach(s => s.classList.remove('active'));
+                
+                // Add active class to clicked link
+                link.classList.add('active');
+                
+                // Show corresponding section
+                const targetId = link.getAttribute('href').substring(1);
+                const targetSection = document.getElementById(targetId);
+                if (targetSection) {
+                    targetSection.classList.add('active');
+                    
+                    // Scroll to top of content
+                    document.querySelector('.content').scrollTop = 0;
+                }
+            });
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            createMatrixRain();
+            
+            if (userWallet) {
+                updateWalletUI();
+            }
+        });
+    </script>
+</body>
+</html>

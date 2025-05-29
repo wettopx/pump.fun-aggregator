@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google" content="notranslate">
+    <title>Create Token - disk.fun</title>
+    <link rel="icon" type="image/x-icon" href="/fav.ico">
+    <link rel="stylesheet" href="https://unpkg.com/98.css">
+    <style>
+        @font-face {
+            font-family: 'Sora';
+            src: url('/sora.woff2') format('woff2');
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Global override to prevent blue/white focus outlines */
+        *:focus {
+            outline: none !important;
+            box-shadow: none !important;
+            -webkit-focus-ring-color: transparent !important;
+        }
+
+        button:focus {
+            outline: none !important;
+            box-shadow: none !important;
+            -webkit-focus-ring-color: transparent !important;
+        }
+
+        body {
+            background: #000000;
+            font-family: 'Sora', 'MS Sans Serif', sans-serif;
+            color: #00ff00;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Matrix rain effect - simplified */
+        #matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.15;
+            z-index: 0;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            z-index: 1000;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            height: 40px;
+            width: auto;
+            cursor: pointer;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background: #000000;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+            font-family: 'Sora', sans-serif;
+            display: inline-block;
+            font-weight: 500;
+            /* Override 98.css 3D effects */
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            outline: none !important;
+        }
+
+        .btn:hover {
+            background: #001100;
+            box-shadow: none !important;
+        }
+
+        .btn:active {
+            box-shadow: none !important;
+            border: 1px solid #00ff00 !important;
+            background: #001100 !important;
+            color: #00ff00 !important;
+        }
+
+        .wallet-info {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #00ff00;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            font-size: 30px;
+            line-height: 1;
+            color: #00ff00;
+            cursor: pointer;
+            margin-left: auto;
+            padding: 0;
+            background: none;
+            border: none;
+            font-family: monospace;
+        }
+
+        .mobile-menu-btn:hover {
+            opacity: 0.8;
+        }
+
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.95);
+            border: 1px solid #00ff00;
+            padding: 20px;
+            z-index: 1001;
+            min-width: 200px;
+        }
+
+        .mobile-menu.active {
+            display: block;
+        }
+
+        .mobile-menu a,
+        .mobile-menu button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            text-align: left;
+            background: transparent;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            text-decoration: none;
+            font-family: 'Sora', sans-serif;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .mobile-menu a:hover,
+        .mobile-menu button:hover {
+            background: #001100;
+        }
+
+        /* Main Container */
+        .main-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+            box-sizing: border-box;
+        }
+
+        /* Launch Window */
+        .launch-window {
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #00ff00;
+            max-width: 500px;
+            width: 100%;
+            height: auto;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+            margin: auto;
+        }
+
+        .window-title {
+            background: #00ff00;
+            color: #000000;
+            padding: 8px 15px;
+            font-weight: bold;
+            font-size: 14px;
+            text-align: center;
+            flex-shrink: 0;
+            box-sizing: border-box;
+        }
+
+        .window-body {
+            padding: 20px 25px 15px 25px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            flex: 1;
+            min-height: 0; /* Important for flex children */
+            max-height: calc(90vh - 42px); /* Adjusted for smaller title height */
+            box-sizing: border-box;
+        }
+
+        /* Custom scrollbar for window body */
+        .window-body::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        .window-body::-webkit-scrollbar-track {
+            background: #000000;
+            border-left: 1px solid #00ff00;
+        }
+
+        .window-body::-webkit-scrollbar-thumb {
+            background: #00ff00;
+            border-left: 1px solid #000000;
+        }
+
+        .window-body::-webkit-scrollbar-thumb:hover {
+            background: #00dd00;
+        }
+
+        /* For Firefox */
+        .window-body {
+            scrollbar-width: thin;
+            scrollbar-color: #00ff00 #001100;
+        }
+
+        .window-body > *:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Ensure smooth scrolling */
+        .window-body {
+            -webkit-overflow-scrolling: touch; /* For smooth scrolling on iOS */
+        }
+
+        /* Form Styles */
+        .tab-container {
+            margin-bottom: 20px;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 10px;
+            background: #000000;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            font-size: 14px;
+            cursor: pointer;
+            font-family: 'Sora', sans-serif;
+            font-weight: 500;
+            opacity: 0.6;
+            /* Remove 98.css effects */
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            outline: none !important;
+        }
+
+        .tab-button:hover {
+            opacity: 0.8;
+            background: #001100;
+            box-shadow: none !important;
+        }
+
+        .tab-button:active {
+            box-shadow: none !important;
+            background: #001100 !important;
+            color: #00ff00 !important;
+        }
+
+        .tab-button.active {
+            opacity: 1;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: #00ff00;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 8px 10px;
+            background: rgba(0, 0, 0, 0.5);
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            font-size: 13px;
+            font-family: 'Sora', sans-serif;
+            /* Remove 98.css effects */
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            outline: none !important;
+        }
+
+        .form-group input[type="number"] {
+            width: 100%;
+            padding: 8px 10px;
+            background: rgba(0, 0, 0, 0.5);
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            font-size: 13px;
+            font-family: 'Sora', sans-serif;
+            /* Remove 98.css effects */
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            outline: none !important;
+            -webkit-appearance: none;
+            -moz-appearance: textfield;
+        }
+
+        .form-group input[type="number"]::-webkit-inner-spin-button,
+        .form-group input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .form-group input:focus {
+            outline: none !important;
+            background: rgba(0, 0, 0, 0.7);
+            box-shadow: none !important;
+            border: 1px solid #00ff00 !important;
+        }
+
+        button[type="submit"], button[type="button"] {
+            width: 100%;
+            padding: 11px;
+            font-size: 14px;
+            background: #000000;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            cursor: pointer;
+            font-family: 'Sora', sans-serif;
+            font-weight: 500;
+            margin-top: 10px;
+            margin-bottom: 0;
+            /* Remove 98.css effects */
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            outline: none !important;
+        }
+
+        button[type="submit"]:hover:not(:disabled), button[type="button"]:hover {
+            background: #001100;
+            box-shadow: none !important;
+        }
+
+        button[type="submit"]:active, button[type="button"]:active {
+            box-shadow: none !important;
+            background: #001100 !important;
+            color: #00ff00 !important;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .status-display {
+            background: rgba(0, 0, 0, 0.5);
+            color: #00ff00;
+            padding: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            border: 1px solid #00ff00;
+            margin-top: 15px;
+            margin-bottom: 0;
+            min-height: 80px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .status-display.error {
+            color: #ff0000;
+            border-color: #ff0000;
+        }
+
+        .status-display.success {
+            color: #00ff00;
+        }
+
+        .loading-display {
+            text-align: center;
+            font-size: 14px;
+            margin: 15px 0;
+            color: #00ff00;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .infected-preview {
+            background: rgba(0, 0, 0, 0.5);
+            color: #00ff00;
+            padding: 10px;
+            border: 1px solid #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            margin-bottom: 12px;
+        }
+
+        .image-preview {
+            margin-top: 8px;
+            text-align: center;
+            display: none;
+        }
+
+        .preview-image {
+            max-width: 100px;
+            max-height: 100px;
+            border: 1px solid #00ff00;
+        }
+
+        /* Glitch effect for infected preview */
+        .glitch-text {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #00ff00;
+            display: inline-block;
+            animation: glitch 0.3s infinite;
+        }
+
+        @keyframes glitch {
+            0% { text-shadow: 0.05em 0 0 rgba(0, 255, 0, 0.75), -0.05em -0.025em 0 rgba(0, 255, 0, 0.5), 0.025em 0.05em 0 rgba(0, 255, 0, 0.3); }
+            14% { text-shadow: 0.05em 0 0 rgba(0, 255, 0, 0.75), -0.05em -0.025em 0 rgba(0, 255, 0, 0.5), 0.025em 0.05em 0 rgba(0, 255, 0, 0.3); }
+            15% { text-shadow: -0.05em -0.025em 0 rgba(0, 255, 0, 0.75), 0.025em 0.025em 0 rgba(0, 255, 0, 0.5), -0.05em -0.05em 0 rgba(0, 255, 0, 0.3); }
+            49% { text-shadow: -0.05em -0.025em 0 rgba(0, 255, 0, 0.75), 0.025em 0.025em 0 rgba(0, 255, 0, 0.5), -0.05em -0.05em 0 rgba(0, 255, 0, 0.3); }
+            50% { text-shadow: 0.025em 0.05em 0 rgba(0, 255, 0, 0.75), 0.05em 0 0 rgba(0, 255, 0, 0.5), 0 -0.05em 0 rgba(0, 255, 0, 0.3); }
+            99% { text-shadow: 0.025em 0.05em 0 rgba(0, 255, 0, 0.75), 0.05em 0 0 rgba(0, 255, 0, 0.5), 0 -0.05em 0 rgba(0, 255, 0, 0.3); }
+            100% { text-shadow: -0.025em 0 0 rgba(0, 255, 0, 0.75), -0.025em -0.025em 0 rgba(0, 255, 0, 0.5), -0.025em -0.05em 0 rgba(0, 255, 0, 0.3); }
+        }
+
+        .infected-warning {
+            color: #ff0000;
+            font-size: 11px;
+            margin-top: 8px;
+            opacity: 0.8;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Override 98.css button styles that might cause blue/white colors */
+        button:active, button:focus, 
+        .btn:active, .btn:focus,
+        .tab-button:active, .tab-button:focus,
+        button[type="submit"]:active, button[type="submit"]:focus,
+        button[type="button"]:active, button[type="button"]:focus {
+            background: #001100 !important;
+            color: #00ff00 !important;
+            border: 1px solid #00ff00 !important;
+            box-shadow: none !important;
+            outline: none !important;
+            filter: none !important;
+        }
+
+        /* Specific override for 98.css button pressed state */
+        button:active:not(:disabled):hover {
+            background: #001100 !important;
+            color: #00ff00 !important;
+            border: 1px solid #00ff00 !important;
+            box-shadow: none !important;
+            outline: none !important;
+        }
+
+        /* Override any link colors */
+        a, a:visited, a:hover, a:active, a:focus {
+            color: #00ff00 !important;
+            text-decoration: none !important;
+        }
+
+        /* Collapsible socials section */
+        .socials-section {
+            margin: 15px 0;
+        }
+
+        .socials-header {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 0;
+            user-select: none;
+        }
+
+        .socials-header:hover {
+            opacity: 0.8;
+        }
+
+        .dropdown-arrow {
+            font-size: 12px;
+            color: #00ff00;
+            transition: transform 0.3s ease;
+            display: inline-block;
+        }
+
+        .dropdown-arrow.open {
+            transform: rotate(90deg);
+        }
+
+        .socials-content {
+            padding-top: 5px;
+            transition: max-height 0.3s ease, opacity 0.3s ease;
+            overflow: hidden;
+        }
+
+        .socials-content .form-group {
+            margin-bottom: 12px;
+        }
+
+        .socials-content .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .rarity-notice {
+            font-size: 10px;
+            color: #00ff00;
+            opacity: 0.7;
+            margin-top: 4px;
+            text-align: center;
+        }
+
+        @media (max-height: 700px) {
+            .launch-window {
+                max-height: 95vh;
+            }
+
+            .window-body {
+                max-height: calc(95vh - 42px);
+            }
+
+            .form-group {
+                margin-bottom: 12px;
+            }
+
+            .status-display {
+                min-height: 60px;
+                padding: 10px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-right {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .launch-window {
+                max-height: 85vh;
+            }
+
+            .window-body {
+                padding: 15px 20px 12px 20px;
+                max-height: calc(85vh - 42px);
+            }
+        }
+    </style>
+</head>
+<body translate="no">
+    <!-- Matrix Background -->
+    <canvas id="matrix-bg"></canvas>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <img src="/disk-logo.svg" alt="disk.fun" class="logo" onclick="window.location.href='/'">
+            <div class="header-right">
+                <span id="wallet-info" class="wallet-info hidden"></span>
+                <a href="/" class="btn">Back to Tokens</a>
+                <a href="/lb.html" class="btn">Leaderboard</a>
+                <a href="/game.html" class="btn">S.I.G</a>
+                <a href="/docs.html" class="btn">Docs</a>
+                <a href="/mp.html" class="btn">Marketplace</a>
+                <button id="connect-btn" class="btn">Connect Phantom</button>
+            </div>
+            <div class="mobile-menu-btn" id="mobile-menu-btn">≡</div>
+        </div>
+        <div class="mobile-menu" id="mobile-menu">
+            <span id="mobile-wallet-info" class="wallet-info hidden"></span>
+            <a href="/">Back to Tokens</a>
+            <a href="/lb.html">Leaderboard</a>
+            <a href="/game.html">S.I.G</a>
+            <a href="/docs.html">Docs</a>
+            <a href="/mp.html">Marketplace</a>
+            <button id="mobile-connect-btn">Connect Phantom</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <div class="launch-window">
+            <div class="window-title">Create Your Token</div>
+            <div class="window-body">
+                <!-- Tab Container -->
+                <div class="tab-container">
+                    <div class="tab-buttons">
+                        <button class="tab-button active" onclick="switchTab('classic')">Classic Token</button>
+                        <button class="tab-button" onclick="switchTab('infected')">Infected Token</button>
+                    </div>
+                </div>
+
+                <!-- Classic Token Form -->
+                <div id="classic-tab" class="tab-content active">
+                    <form id="classic-launch-form">
+                        <div class="form-group">
+                            <label for="classic-name">Token Name</label>
+                            <input type="text" id="classic-name" name="name" placeholder="Enter token name" required maxlength="32">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="classic-symbol">Token Symbol</label>
+                            <input type="text" id="classic-symbol" name="symbol" placeholder="SYMBOL" required maxlength="10" style="text-transform: uppercase;">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="classic-image">Token Image</label>
+                            <input type="file" id="classic-image" name="image" accept="image/*" required>
+                            <div id="classic-preview" class="image-preview">
+                                <img id="classic-preview-img" class="preview-image" alt="Preview">
+                            </div>
+                        </div>
+
+                        <div class="socials-section">
+                            <div class="socials-header" onclick="toggleSocials()">
+                                <span class="dropdown-arrow" id="socials-arrow">▶</span>
+                                <span style="font-size: 13px; color: #00ff00; opacity: 0.8;">add social links (optional)</span>
+                            </div>
+                            
+                            <div class="socials-content" id="socials-content" style="display: none; max-height: 0; opacity: 0;">
+                                <div class="form-group">
+                                    <label for="classic-twitter">X/Twitter</label>
+                                    <input type="text" id="classic-twitter" name="twitter" placeholder="https://twitter.com/yourtoken" maxlength="200">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="classic-telegram">Telegram</label>
+                                    <input type="text" id="classic-telegram" name="telegram" placeholder="https://t.me/yourtoken" maxlength="200">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="classic-website">Website</label>
+                                    <input type="text" id="classic-website" name="website" placeholder="https://yourtoken.com" maxlength="200">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-top: 15px;">
+                            <label for="classic-devbuy">Dev Buy Amount (SOL)</label>
+                            <input type="number" id="classic-devbuy" name="devBuyAmount" placeholder="0" min="0" max="2" step="0.01" style="width: 100%;">
+                            <div style="font-size: 11px; color: #00ff00; opacity: 0.6; margin-top: 3px;">Buy into your token at launch (max 2 SOL)</div>
+                        </div>
+                        
+                        <button type="submit" id="classic-launch-btn" disabled style="margin-top: 15px;">Launch Classic Token</button>
+                    </form>
+                </div>
+
+                <!-- Infected Token Form -->
+                <div id="infected-tab" class="tab-content">
+                    <form id="infected-launch-form">
+                        <div class="infected-preview">
+                            INFECTED MODE ACTIVATED
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>VIRUS INFECTED TOKEN</label>
+                            <div class="infected-preview">
+                                <div>Name: <span id="random-name" class="glitch-text">XXXXXXXX</span></div>
+                                <div>Symbol: <span id="random-symbol" class="glitch-text">XXXX</span></div>
+                                <div>Image: Random virus asset</div>
+                                <div style="font-size: 10px; opacity: 0.7; margin-top: 3px;">Classification: <span id="classification">Unknown</span></div>
+                            </div>
+                            <div class="infected-warning">
+                                WARNING: TOKEN IDENTITY CLASSIFIED
+                            </div>
+                            <div class="rarity-notice">
+                                95% Common (Gero) • 4% Rare (Neo) • 0.9% Epic (Net) • 0.1% Legendary (Bio)
+                            </div>
+                        </div>
+                        
+                        <button type="submit" id="infected-launch-btn" disabled style="margin-top: 15px;">Launch Infected Token</button>
+                    </form>
+                </div>
+
+                <!-- Loading Display -->
+                <div id="loading" class="loading-display hidden">
+                    <div id="loading-text">Processing...</div>
+                </div>
+
+                <!-- Status Display -->
+                <div id="result" class="status-display">
+Ready. Connect wallet to begin.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import {
+            Connection,
+            PublicKey,
+            SystemProgram,
+            Transaction,
+            LAMPORTS_PER_SOL,
+            VersionedTransaction,
+            Keypair
+        } from "https://esm.sh/@solana/web3.js@1.95.0";
+
+        // Config
+        const SERVICE_WALLET = new PublicKey("7LrAAwnQmY7Fiqu6bne4Uq3HJ1bBWCs4q5VSW7FU9qcn");
+        const RPC_ENDPOINTS = [
+            "https://rpc.ankr.com/solana",
+            "https://solana.publicnode.com"
+        ];
+        
+        let connection = new Connection(RPC_ENDPOINTS[0], "processed");
+
+        // State
+        let userWallet = localStorage.getItem('userWallet') || null;
+        let currentTab = 'classic';
+        let currentRandomName = '';
+        let currentRandomSymbol = '';
+        let currentPrefix = '';
+        let infectedTokenGenerated = false;
+
+        // Glitch characters for infected display
+        const glitchChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|;:,.<>?/~`';
+
+        // Create matrix rain effect
+        function createMatrixRain() {
+            const canvas = document.getElementById('matrix-bg');
+            const ctx = canvas.getContext('2d');
+
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const fontSize = 14;
+            const columns = canvas.width / fontSize;
+            const drops = [];
+
+            // Japanese katakana and numbers
+            const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+
+            for(let x = 0; x < columns; x++) {
+                drops[x] = Math.random() * canvas.height;
+            }
+
+            function draw() {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                ctx.fillStyle = '#00ff00';
+                ctx.font = fontSize + 'px monospace';
+
+                for(let i = 0; i < drops.length; i++) {
+                    const text = chars[Math.floor(Math.random() * chars.length)];
+                    ctx.fillText(text, i * fontSize, drops[i]);
+
+                    if(drops[i] > canvas.height && Math.random() > 0.98) {
+                        drops[i] = 0;
+                    }
+                    drops[i] += fontSize;
+                }
+            }
+
+            setInterval(draw, 50);
+
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+        }
+
+        // Generate glitch text
+        function generateGlitchText(length) {
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += glitchChars.charAt(Math.floor(Math.random() * glitchChars.length));
+            }
+            return result;
+        }
+
+        // Animate glitch text
+        function animateGlitchText() {
+            if (currentTab === 'infected') {
+                // Always show glitch text, even after generation
+                document.getElementById('random-name').textContent = generateGlitchText(8);
+                document.getElementById('random-symbol').textContent = generateGlitchText(4);
+            }
+        }
+
+        // Update wallet UI
+        function updateWalletUI() {
+            if (userWallet) {
+                document.getElementById("wallet-info").textContent = userWallet.slice(0, 4) + "..." + userWallet.slice(-4);
+                document.getElementById("wallet-info").classList.remove("hidden");
+                document.getElementById("connect-btn").textContent = "Connected";
+                document.getElementById("classic-launch-btn").disabled = false;
+                document.getElementById("infected-launch-btn").disabled = false;
+                showResult("Wallet connected! Ready to launch tokens.", "success");
+                
+                // Update mobile menu wallet info
+                const mobileWalletInfo = document.getElementById("mobile-wallet-info");
+                if (mobileWalletInfo) {
+                    mobileWalletInfo.textContent = userWallet.slice(0, 4) + "..." + userWallet.slice(-4);
+                    mobileWalletInfo.classList.remove("hidden");
+                    document.getElementById("mobile-connect-btn").textContent = "Connected";
+                }
+            }
+        }
+
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('active');
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            
+            if (!mobileMenu.contains(event.target) && !mobileMenuBtn.contains(event.target)) {
+                mobileMenu.classList.remove('active');
+            }
+        });
+
+        // Generate random infected token
+        async function generateRandomInfected() {
+            if (infectedTokenGenerated) return; // Only generate once per tab switch
+            
+            try {
+                const response = await fetch('/api/generate-infected-name');
+                
+                if (!response.ok) {
+                    throw new Error('Failed to generate name');
+                }
+                
+                const data = await response.json();
+                
+                currentRandomName = data.name;
+                currentRandomSymbol = data.symbol;
+                currentPrefix = data.prefix;
+                infectedTokenGenerated = true;
+                
+                // DO NOT SHOW THE ACTUAL NAME - keep it censored
+                // Keep showing glitch text
+                
+                // Update classification based on prefix
+                let classification = 'Common';
+                if (data.prefix === 'Bio') classification = 'Legendary';
+                else if (data.prefix === 'Net') classification = 'Epic';
+                else if (data.prefix === 'Neo') classification = 'Rare';
+                
+                document.getElementById('classification').textContent = classification;
+                
+                console.log(`Generated infected token (hidden) - Prefix: ${data.prefix}, Classification: ${classification}`);
+                
+            } catch (error) {
+                console.error('Error generating infected name:', error);
+                
+                // Fallback to local generation if API fails
+                const rand = Math.random() * 100;
+                let prefix;
+                
+                // Match server-side rarity
+                if (rand < 95) prefix = 'Gero';
+                else if (rand < 99) prefix = 'Neo';
+                else if (rand < 99.9) prefix = 'Net';
+                else prefix = 'Bio';
+                
+                const suffixes = ['tech', 'core', 'sync', 'flux', 'mind', 'wave', 'link', 'node', 'mesh', 'grid',
+                                 'nexus', 'prime', 'alpha', 'omega', 'cyber', 'nano', 'quantum', 'neural', 'virus', 'byte'];
+                const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
+                
+                currentPrefix = prefix;
+                currentRandomName = prefix + suffix;
+                currentRandomSymbol = suffix.toUpperCase(); // No length limit
+                infectedTokenGenerated = true;
+                
+                // DO NOT SHOW THE ACTUAL NAME - keep it censored
+                let classification = 'Common';
+                if (prefix === 'Bio') classification = 'Legendary';
+                else if (prefix === 'Net') classification = 'Epic';
+                else if (prefix === 'Neo') classification = 'Rare';
+                
+                document.getElementById('classification').textContent = classification;
+            }
+        }
+
+        // Toggle socials section
+        window.toggleSocials = function() {
+            const content = document.getElementById('socials-content');
+            const arrow = document.getElementById('socials-arrow');
+            
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                arrow.classList.add('open');
+                // Animate opening
+                setTimeout(() => {
+                    content.style.maxHeight = '300px';
+                    content.style.opacity = '1';
+                }, 10);
+            } else {
+                // Animate closing
+                content.style.maxHeight = '0';
+                content.style.opacity = '0';
+                arrow.classList.remove('open');
+                setTimeout(() => {
+                    content.style.display = 'none';
+                }, 300);
+            }
+        };
+
+        // Tab switching
+        window.switchTab = function(tab) {
+            currentTab = tab;
+            
+            // Reset infected generation when switching away
+            if (tab !== 'infected') {
+                infectedTokenGenerated = false;
+                currentRandomName = '';
+                currentRandomSymbol = '';
+                currentPrefix = '';
+            }
+            
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`${tab}-tab`).classList.add('active');
+            
+            // Generate infected token when switching to infected tab
+            if (tab === 'infected' && !infectedTokenGenerated) {
+                generateRandomInfected();
+            }
+        };
+
+        // RPC fallback function
+        async function tryRpcCall(callFunction) {
+            try {
+                connection = new Connection(RPC_ENDPOINTS[0], "processed");
+                return await callFunction();
+            } catch (error) {
+                console.log(`Primary RPC failed, using backup:`, error.message);
+                connection = new Connection(RPC_ENDPOINTS[1], "processed");
+                return await callFunction();
+            }
+        }
+
+        // Utility functions
+        function showLoading(text) {
+            document.getElementById('loading-text').textContent = text;
+            document.getElementById('loading').classList.remove("hidden");
+            document.getElementById('result').style.display = "none";
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').classList.add("hidden");
+            document.getElementById('result').style.display = "block";
+        }
+
+        function showResult(text, type) {
+            document.getElementById('result').textContent = text;
+            document.getElementById('result').className = `status-display ${type || ''}`;
+            hideLoading();
+        }
+
+        // Connect wallet function
+        async function connectWallet() {
+            try {
+                if (!window.solana) {
+                    showResult("Phantom wallet not found! Please install Phantom.", "error");
+                    window.open("https://phantom.app/", "_blank");
+                    return;
+                }
+
+                const response = await window.solana.connect();
+                userWallet = response.publicKey.toString();
+                
+                // Save to localStorage
+                localStorage.setItem('userWallet', userWallet);
+                
+                updateWalletUI();
+
+            } catch (error) {
+                console.error("Connection error:", error);
+                showResult("Failed to connect: " + error.message, "error");
+            }
+        }
+
+        // Launch token function
+        async function launchToken(formData, launchType) {
+            const name = formData.get("name").trim();
+            const symbol = formData.get("symbol").trim();
+            const image = formData.get("image");
+
+            if (!name || !symbol) {
+                showResult("Missing token data!", "error");
+                return;
+            }
+
+            if (launchType === 'classic' && (!image || image.size === 0)) {
+                showResult("Please select an image!", "error");
+                return;
+            }
+
+            if (launchType === 'classic' && image.size > 5 * 1024 * 1024) {
+                showResult("Image too large (max 5MB)!", "error");
+                return;
+            }
+
+            try {
+                showLoading("Paying service fee...");
+                
+                // Dev buy is handled in the token creation transaction, not here
+                const devBuy = launchType === 'classic' ? parseFloat(formData.get("devBuyAmount") || 0) : 0;
+                if (devBuy > 0) {
+                    console.log(`Dev buy of ${devBuy} SOL will be included in token creation`);
+                }
+                
+                const feeInstruction = SystemProgram.transfer({
+                    fromPubkey: new PublicKey(userWallet),
+                    toPubkey: SERVICE_WALLET,
+                    lamports: 0.04 * LAMPORTS_PER_SOL
+                });
+
+                const feeTransaction = new Transaction().add(feeInstruction);
+                feeTransaction.feePayer = new PublicKey(userWallet);
+                
+                const { blockhash } = await tryRpcCall(async () => {
+                    return await connection.getLatestBlockhash();
+                });
+                feeTransaction.recentBlockhash = blockhash;
+
+                const signedFeeTransaction = await window.solana.signTransaction(feeTransaction);
+                
+                const feeSignature = await tryRpcCall(async () => {
+                    return await connection.sendRawTransaction(signedFeeTransaction.serialize(), {
+                        skipPreflight: true,
+                        maxRetries: 0
+                    });
+                });
+                
+                console.log("Fee payment sent:", feeSignature);
+
+                showLoading(`Creating ${launchType} token...`);
+                
+                formData.append("userPublicKey", userWallet);
+                formData.append("launchType", launchType);
+                
+                const response = await fetch(`/launch-${launchType}`, {
+                    method: "POST",
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || "Launch failed");
+                }
+
+                const { serializedTx, mint, mintSecret, finalName, devBuyAmount } = await response.json();
+
+                showLoading("Finalizing...");
+                
+                const mintTxBytes = new Uint8Array(serializedTx);
+                let mintTransaction = VersionedTransaction.deserialize(mintTxBytes);
+                
+                [mintTransaction] = await window.solana.signAllTransactions([mintTransaction]);
+                
+                const mintKeypair = Keypair.fromSecretKey(new Uint8Array(mintSecret));
+                mintTransaction.sign([mintKeypair]);
+
+                const mintSignature = await tryRpcCall(async () => {
+                    return await connection.sendRawTransaction(mintTransaction.serialize(), {
+                        skipPreflight: true,
+                        maxRetries: 0
+                    });
+                });
+                
+                const pumpUrl = `https://pump.fun/${mint}`;
+                const displayName = finalName || name;
+                const devBuyText = devBuyAmount > 0 ? `\nDev Buy: ${devBuyAmount} SOL` : '';
+                
+                showResult(`${launchType.toUpperCase()} TOKEN LAUNCHED!
+
+${displayName} (${symbol})
+Mint: ${mint}${devBuyText}
+
+Pump: ${pumpUrl}
+Fee TX: ${feeSignature}
+Mint TX: ${mintSignature}
+
+Token is live! Redirecting...`, "success");
+
+                if (launchType === 'classic') {
+                    document.getElementById('classic-launch-form').reset();
+                    document.getElementById('classic-preview').style.display = 'none';
+                } else {
+                    document.getElementById('infected-launch-form').reset();
+                    // Reset infected generation for next time
+                    infectedTokenGenerated = false;
+                    currentRandomName = '';
+                    currentRandomSymbol = '';
+                    currentPrefix = '';
+                }
+
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 5000);
+
+            } catch (error) {
+                showResult(`${launchType} launch failed: ${error.message}`, "error");
+            } finally {
+                // Always reset infected token generation on error or success
+                if (launchType === 'infected') {
+                    infectedTokenGenerated = false;
+                    currentRandomName = '';
+                    currentRandomSymbol = '';
+                    currentPrefix = '';
+                }
+            }
+        }
+
+        // DOM ready
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("Create page loaded");
+
+            // Initialize matrix rain
+            createMatrixRain();
+
+            // Check saved wallet
+            if (userWallet) {
+                updateWalletUI();
+            }
+
+            // Start glitch text animation
+            setInterval(animateGlitchText, 100);
+
+            document.getElementById('connect-btn').addEventListener('click', connectWallet);
+            document.getElementById('mobile-connect-btn').addEventListener('click', connectWallet);
+
+            document.getElementById('classic-image').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        document.getElementById('classic-preview-img').src = e.target.result;
+                        document.getElementById('classic-preview').style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    document.getElementById('classic-preview').style.display = 'none';
+                }
+            });
+
+            document.getElementById('classic-symbol').addEventListener("input", (e) => {
+                e.target.value = e.target.value.toUpperCase();
+            });
+
+            document.getElementById('classic-launch-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                if (!userWallet) {
+                    showResult("Connect wallet first!", "error");
+                    return;
+                }
+
+                // Validate URLs if provided
+                const twitter = document.getElementById('classic-twitter').value;
+                const telegram = document.getElementById('classic-telegram').value;
+                const website = document.getElementById('classic-website').value;
+                
+                if (twitter && !twitter.match(/^https?:\/\/(www\.)?(twitter\.com|x\.com)\/.+$/i)) {
+                    showResult("Invalid Twitter/X URL format", "error");
+                    return;
+                }
+                
+                if (telegram && !telegram.match(/^https?:\/\/(www\.)?(t\.me|telegram\.me)\/.+$/i)) {
+                    showResult("Invalid Telegram URL format", "error");
+                    return;
+                }
+                
+                if (website && !website.match(/^https?:\/\/.+\..+$/i)) {
+                    showResult("Invalid website URL format", "error");
+                    return;
+                }
+
+                document.getElementById('classic-launch-btn').disabled = true;
+                const formData = new FormData(e.target);
+                
+                await launchToken(formData, 'classic');
+                
+                hideLoading();
+                document.getElementById('classic-launch-btn').disabled = false;
+            });
+
+            document.getElementById('infected-launch-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                if (!userWallet) {
+                    showResult("Connect wallet first!", "error");
+                    return;
+                }
+
+                if (!currentRandomName || !currentRandomSymbol) {
+                    showResult("Infected token not ready! Please wait...", "error");
+                    // Try to generate again
+                    infectedTokenGenerated = false;
+                    generateRandomInfected();
+                    return;
+                }
+
+                document.getElementById('infected-launch-btn').disabled = true;
+                
+                const formData = new FormData();
+                formData.append("name", currentRandomName);
+                formData.append("symbol", currentRandomSymbol);
+                formData.append("randomInfected", "true");
+                
+                await launchToken(formData, 'infected');
+                
+                hideLoading();
+                document.getElementById('infected-launch-btn').disabled = false;
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google" content="notranslate">
+    <title>Marketplace - disk.fun</title>
+    <link rel="icon" type="image/x-icon" href="/fav.ico">
+    <link rel="stylesheet" href="https://unpkg.com/98.css">
+    <style>
+        @font-face {
+            font-family: 'Sora';
+            src: url('/sora.woff2') format('woff2');
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            color: #00ff00;
+            font-family: 'Sora', sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Matrix rain effect - simplified */
+        #matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.15;
+            z-index: 0;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            z-index: 1000;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            height: 40px;
+            width: auto;
+            cursor: pointer;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            font-size: 30px;
+            line-height: 1;
+            color: #00ff00;
+            cursor: pointer;
+            margin-left: auto;
+            padding: 0;
+            background: none;
+            border: none;
+            font-family: monospace;
+        }
+
+        .mobile-menu-btn:hover {
+            opacity: 0.8;
+        }
+
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.95);
+            border: 1px solid #00ff00;
+            padding: 20px;
+            z-index: 1001;
+            min-width: 200px;
+        }
+
+        .mobile-menu.active {
+            display: block;
+        }
+
+        .mobile-menu a {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            text-align: left;
+            background: transparent;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            text-decoration: none;
+            font-family: 'Sora', sans-serif;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .mobile-menu a:hover {
+            background: #001100;
+        }
+
+        /* Main Content */
+        .main-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            padding: 80px 20px 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Override 98.css colors for black and green only */
+        .window {
+            background: #000 !important;
+            border: 2px solid #00ff00 !important;
+            box-shadow: none !important;
+        }
+
+        .title-bar {
+            background: #00ff00 !important;
+            color: #000 !important;
+            padding: 2px 4px !important;
+        }
+
+        .title-bar-text {
+            color: #000 !important;
+            font-weight: 600;
+            font-family: 'Sora', sans-serif;
+            font-size: 13px;
+        }
+
+        .window-body {
+            color: #00ff00 !important;
+            padding: 30px 40px;
+            text-align: center;
+            font-family: 'Sora', sans-serif;
+            background: #000 !important;
+            margin: 0;
+        }
+
+        .error-code {
+            font-size: 72px;
+            font-weight: 600;
+            margin: 0 0 20px 0;
+            line-height: 1;
+        }
+
+        .message {
+            font-size: 16px;
+            margin: 0 0 30px 0;
+            line-height: 1.6;
+        }
+
+        .message p {
+            margin: 0 0 10px 0;
+        }
+
+        .message p:last-child {
+            margin-bottom: 0;
+        }
+
+        .message strong {
+            font-weight: 600;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 0;
+        }
+
+        button {
+            background: #000 !important;
+            color: #00ff00 !important;
+            border: 1px solid #00ff00 !important;
+            font-family: 'Sora', sans-serif;
+            font-weight: 400;
+            font-size: 14px;
+            padding: 10px 24px;
+            cursor: pointer;
+            min-width: 90px;
+        }
+
+        button:hover {
+            background: #00ff00 !important;
+            color: #000 !important;
+        }
+
+        button:focus {
+            outline: 1px dotted #00ff00;
+            outline-offset: 2px;
+        }
+
+        .status-bar {
+            background: #000 !important;
+            border-top: 1px solid #00ff00 !important;
+            color: #00ff00 !important;
+            font-family: 'Sora', sans-serif;
+            font-size: 12px;
+            padding: 4px 6px !important;
+            margin: 0;
+        }
+
+        .status-bar p {
+            margin: 0 !important;
+        }
+
+        /* Remove all 98.css shadows and gray colors */
+        * {
+            box-shadow: none !important;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body translate="no">
+    <canvas id="matrix-bg"></canvas>
+    
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <img src="/disk-logo.svg" alt="disk.fun" class="logo" onclick="window.location.href='/'">
+            <div class="mobile-menu-btn" id="mobile-menu-btn">≡</div>
+        </div>
+        <div class="mobile-menu" id="mobile-menu">
+            <a href="/">Home</a>
+            <a href="/lb.html">Leaderboard</a>
+            <a href="/game.html">S.I.G</a>
+            <a href="/docs.html">Docs</a>
+            <a href="/create.html">Create Coin</a>
+        </div>
+    </header>
+    
+    <!-- Main Container -->
+    <div class="main-container">
+        <div class="window" style="width: 420px;">
+            <div class="title-bar">
+                <div class="title-bar-text">disk.fun marketplace</div>
+            </div>
+            <div class="window-body">
+                <div class="error-code">404</div>
+                <div class="message">
+                    <p><strong>MARKETPLACE NOT AVAILABLE YET</strong></p>
+                    <p>This feature is currently under development</p>
+                </div>
+                <div class="button-container">
+                    <button onclick="window.location.href='/'">Go Home</button>
+                </div>
+            </div>
+            <div class="status-bar">
+                <p class="status-bar-field">Coming Soon</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple Matrix rain effect
+        const canvas = document.getElementById('matrix-bg');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const fontSize = 14;
+        const columns = canvas.width / fontSize;
+        const drops = [];
+
+        // Japanese katakana and numbers
+        const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+
+        for(let x = 0; x < columns; x++) {
+            drops[x] = Math.random() * canvas.height;
+        }
+
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#00ff00';
+            ctx.font = fontSize + 'px monospace';
+
+            for(let i = 0; i < drops.length; i++) {
+                const text = chars[Math.floor(Math.random() * chars.length)];
+                ctx.fillText(text, i * fontSize, drops[i]);
+
+                if(drops[i] > canvas.height && Math.random() > 0.98) {
+                    drops[i] = 0;
+                }
+                drops[i] += fontSize;
+            }
+        }
+
+        setInterval(draw, 50);
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('active');
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            
+            if (!mobileMenu.contains(event.target) && !mobileMenuBtn.contains(event.target)) {
+                mobileMenu.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>

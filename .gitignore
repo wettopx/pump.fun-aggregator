@@ -1,0 +1,7 @@
+# Create .gitignore with the necessary entries
+echo "node_modules/
+.env
+data/*.json
+.DS_Store
+*.log
+npm-debug.log*" > .gitignore

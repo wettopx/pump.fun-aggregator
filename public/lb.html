@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google" content="notranslate">
+    <title>Leaderboard - disk.fun</title>
+    <link rel="icon" type="image/x-icon" href="/fav.ico">
+    <link rel="stylesheet" href="https://unpkg.com/98.css">
+    <!-- Reset table styles after 98.css -->
+    <style>
+        /* Complete table reset */
+        table {
+            border-collapse: collapse !important;
+            border-spacing: 0 !important;
+            border: none !important;
+            background: transparent !important;
+            box-shadow: none !important;
+        }
+        
+        table * {
+            border: none !important;
+            box-shadow: none !important;
+            background-image: none !important;
+        }
+    </style>
+    <!-- Immediate override of 98.css table styles -->
+    <style>
+        /* Override all table borders with transparent */
+        table, table * {
+            border-color: transparent !important;
+            box-shadow: none !important;
+        }
+        
+        table {
+            border: 1px solid transparent !important;
+            background: transparent !important;
+        }
+        
+        td, th {
+            border: 1px solid transparent !important;
+            background: transparent !important;
+        }
+        
+        /* Ensure borders stay transparent */
+        table, tr, td, th {
+            border-color: #000000 !important;
+            border-style: solid !important;
+            border-width: 0 !important;
+        }
+        
+        /* 98.css specific table cell override */
+        table td,
+        table th,
+        td,
+        th {
+            background-color: transparent !important;
+            background-image: none !important;
+            border: 0 solid #000000 !important;
+            box-shadow: none !important;
+            -webkit-box-shadow: none !important;
+            -moz-box-shadow: none !important;
+        }
+    </style>
+    <style>
+        @font-face {
+            font-family: 'Sora';
+            src: url('/sora.woff2') format('woff2');
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000000;
+            font-family: 'Sora', 'MS Sans Serif', sans-serif;
+            color: #00ff00;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Matrix rain effect - simplified */
+        #matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.15;
+            z-index: 0;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            z-index: 1000;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            height: 40px;
+            width: auto;
+            cursor: pointer;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background: #000000;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+            font-family: 'Sora', sans-serif;
+            display: inline-block;
+            font-weight: 500;
+            /* Override 98.css 3D effects */
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            outline: none !important;
+        }
+
+        .btn:hover {
+            background: #001100;
+            box-shadow: none !important;
+        }
+
+        .btn:active {
+            box-shadow: none !important;
+            border: 1px solid #00ff00 !important;
+        }
+
+        .wallet-info {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #00ff00;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            font-size: 30px;
+            line-height: 1;
+            color: #00ff00;
+            cursor: pointer;
+            margin-left: auto;
+            padding: 0;
+            background: none;
+            border: none;
+            font-family: monospace;
+        }
+
+        .mobile-menu-btn:hover {
+            opacity: 0.8;
+        }
+
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.95);
+            border: 1px solid #00ff00;
+            padding: 20px;
+            z-index: 1001;
+            min-width: 200px;
+        }
+
+        .mobile-menu.active {
+            display: block;
+        }
+
+        .mobile-menu a,
+        .mobile-menu button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            text-align: left;
+            background: transparent;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            text-decoration: none;
+            font-family: 'Sora', sans-serif;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .mobile-menu a:hover,
+        .mobile-menu button:hover {
+            background: #001100;
+        }
+
+        /* Main Container */
+        .main-container {
+            padding: 100px 20px 40px;
+            position: relative;
+            z-index: 1;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* Title */
+        .title-section {
+            text-align: center;
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .title {
+            font-size: 36px;
+            font-weight: bold;
+            color: #00ff00;
+            display: inline-block;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 16px;
+            margin-bottom: 40px;
+            opacity: 0.7;
+        }
+
+        /* Airdrop Button */
+        .airdrop-btn {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 36px !important;
+            height: 36px !important;
+            min-width: 36px !important;
+            min-height: 36px !important;
+            max-width: 36px !important;
+            max-height: 36px !important;
+            background: #1a4d1a;
+            border: none;
+            border-radius: 50% !important;
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: 0 !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            aspect-ratio: 1 / 1;
+        }
+
+        .airdrop-btn:hover {
+            background: #1a4d1a;
+            transform: translateY(-50%);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.6), 0 0 30px rgba(0, 255, 0, 0.3);
+        }
+
+        .airdrop-btn::before {
+            content: '?';
+            font-family: monospace;
+            font-size: 18px;
+            font-weight: bold;
+            color: #00ff00;
+            display: block;
+            line-height: 1;
+            transform: scaleX(0.9);
+        }
+
+        /* Airdrop Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #000000;
+            border: 2px solid #00ff00;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+        }
+
+        .modal-header {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #00ff00;
+            text-align: center;
+        }
+
+        .modal-body {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #00ff00;
+        }
+
+        .modal-body ul {
+            margin: 15px 0;
+            padding-left: 25px;
+        }
+
+        .modal-body li {
+            margin-bottom: 10px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 5px;
+            width: auto;
+            height: auto;
+            background: transparent !important;
+            color: #00ff00;
+            border: none !important;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0 !important;
+            font-family: monospace;
+            line-height: 1;
+            transition: all 0.2s;
+            box-shadow: none !important;
+            outline: none !important;
+        }
+
+        .modal-close:hover {
+            background: transparent !important;
+            color: #00ff00;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
+            transform: scale(1.1);
+        }
+
+        /* Leaderboard Table */
+        .leaderboard-table {
+            width: 100%;
+            background: transparent;
+            border-collapse: collapse;
+            border: 1px solid #00ff00;
+        }
+
+        .leaderboard-table th,
+        .leaderboard-table td {
+            padding: 15px;
+            text-align: left;
+            border: 1px solid #00ff00;
+            position: relative;
+        }
+
+        .leaderboard-table th {
+            background: transparent;
+            color: #00ff00;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-bottom: 2px solid #00ff00;
+        }
+
+        /* Add vertical strokes between columns */
+        .leaderboard-table th:not(:last-child),
+        .leaderboard-table td:not(:last-child) {
+            border-right: 1px solid #00ff00 !important;
+        }
+
+        .leaderboard-table tr:hover {
+            background: rgba(0, 255, 0, 0.05);
+        }
+
+        .rank {
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .rank-1 { color: #ffd700; }
+        .rank-2 { color: #c0c0c0; }
+        .rank-3 { color: #cd7f32; }
+
+        .wallet-address {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        .points {
+            font-weight: bold;
+            font-size: 16px;
+            color: #00ff00;
+        }
+
+        /* Loading and Empty States */
+        .loading, .no-data {
+            text-align: center;
+            padding: 80px 20px;
+            font-size: 16px;
+            opacity: 0.6;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 768px) {
+            .header-right {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .title {
+                font-size: 24px;
+            }
+
+            .airdrop-btn {
+                position: static;
+                transform: none;
+                margin: 10px auto;
+            }
+
+            .title-section {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .leaderboard-table {
+                font-size: 14px;
+            }
+
+            .leaderboard-table th,
+            .leaderboard-table td {
+                padding: 10px 5px;
+            }
+        }
+        
+        /* ABSOLUTE FINAL OVERRIDE - MUST BE LAST */
+        table, table *, td, th, tr, thead, tbody {
+            border: 0 !important;
+            border-width: 0px !important;
+            border-style: none !important;
+            border-color: transparent !important;
+            box-shadow: 0 0 0 0 transparent !important;
+            -webkit-box-shadow: 0 0 0 0 transparent !important;
+            -moz-box-shadow: 0 0 0 0 transparent !important;
+            outline: 0 !important;
+            background-image: none !important;
+        }
+
+        /* Re-add only the strokes we want */
+        .leaderboard-table {
+            border: 1px solid #00ff00 !important;
+        }
+        
+        .leaderboard-table th:not(:last-child),
+        .leaderboard-table td:not(:last-child) {
+            border-right: 1px solid #00ff00 !important;
+        }
+        
+        .leaderboard-table th {
+            border-bottom: 2px solid #00ff00 !important;
+        }
+    </style>
+    </style>
+</head>
+<body translate="no">
+    <!-- Matrix Background -->
+    <canvas id="matrix-bg"></canvas>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <img src="/disk-logo.svg" alt="disk.fun" class="logo" onclick="window.location.href='/'">
+            <div class="header-right">
+                <span id="wallet-info" class="wallet-info hidden"></span>
+                <a href="/" class="btn">Home</a>
+                <a href="/game.html" class="btn">S.I.G</a>
+                <a href="/docs.html" class="btn">Docs</a>
+                <a href="/mp.html" class="btn">Marketplace</a>
+                <a href="/create.html" class="btn">Create Coin</a>
+                <button id="connect-btn" class="btn">Connect Phantom</button>
+            </div>
+            <div class="mobile-menu-btn" id="mobile-menu-btn">≡</div>
+        </div>
+        <div class="mobile-menu" id="mobile-menu">
+            <span id="mobile-wallet-info" class="wallet-info hidden"></span>
+            <a href="/">Home</a>
+            <a href="/game.html">S.I.G</a>
+            <a href="/docs.html">Docs</a>
+            <a href="/mp.html">Marketplace</a>
+            <a href="/create.html">Create Coin</a>
+            <button id="mobile-connect-btn">Connect Phantom</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <div class="title-section">
+            <h1 class="title">LEADERBOARD</h1>
+            <button class="airdrop-btn" id="airdrop-btn" title="Airdrop Info"></button>
+        </div>
+        <p class="subtitle">Top 100 Players</p>
+
+        <table class="leaderboard-table" id="leaderboard-table">
+            <thead>
+                <tr>
+                    <th style="width: 80px;">Rank</th>
+                    <th>Creator</th>
+                    <th style="width: 120px;">Points</th>
+                </tr>
+            </thead>
+            <tbody id="leaderboard-body">
+                <tr>
+                    <td colspan="3" class="loading">Loading leaderboard...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Airdrop Modal -->
+    <div class="modal-overlay" id="airdrop-modal">
+        <div class="modal-content">
+            <button class="modal-close" id="modal-close">X</button>
+            <div class="modal-header">AIRDROP INFORMATION</div>
+            <div class="modal-body">
+                <p><strong>disk.fun Token Airdrop Program</strong></p>
+                <ul>
+                    <li>Airdrops will be distributed to the <strong>TOP 100</strong> leaderboard players</li>
+                    <li>Distribution starts <strong>AFTER PUBLIC LAUNCH</strong> (not during beta)</li>
+                    <li>Airdrops will be distributed <strong>WEEKLY</strong></li>
+                    <li>Keep launching tokens and climbing the ranks!</li>
+                    <li>More details will be announced at public launch</li>
+                </ul>
+                <p style="margin-top: 20px; opacity: 0.7;">Stay tuned for official announcements about the disk.fun token and airdrop schedule.</p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { Connection, PublicKey } from "https://esm.sh/@solana/web3.js@1.95.0";
+
+        // Global state
+        let userWallet = localStorage.getItem('userWallet') || null;
+
+        // Create matrix rain effect
+        function createMatrixRain() {
+            const canvas = document.getElementById('matrix-bg');
+            const ctx = canvas.getContext('2d');
+
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const fontSize = 14;
+            const columns = canvas.width / fontSize;
+            const drops = [];
+
+            // Japanese katakana and numbers
+            const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+
+            for(let x = 0; x < columns; x++) {
+                drops[x] = Math.random() * canvas.height;
+            }
+
+            function draw() {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                ctx.fillStyle = '#00ff00';
+                ctx.font = fontSize + 'px monospace';
+
+                for(let i = 0; i < drops.length; i++) {
+                    const text = chars[Math.floor(Math.random() * chars.length)];
+                    ctx.fillText(text, i * fontSize, drops[i]);
+
+                    if(drops[i] > canvas.height && Math.random() > 0.98) {
+                        drops[i] = 0;
+                    }
+                    drops[i] += fontSize;
+                }
+            }
+
+            setInterval(draw, 50);
+
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+        }
+
+        // Update wallet UI
+        function updateWalletUI() {
+            if (userWallet) {
+                document.getElementById("wallet-info").textContent = userWallet.slice(0, 4) + "..." + userWallet.slice(-4);
+                document.getElementById("wallet-info").classList.remove("hidden");
+                document.getElementById("connect-btn").textContent = "Connected";
+                
+                // Update mobile menu wallet info
+                const mobileWalletInfo = document.getElementById("mobile-wallet-info");
+                if (mobileWalletInfo) {
+                    mobileWalletInfo.textContent = userWallet.slice(0, 4) + "..." + userWallet.slice(-4);
+                    mobileWalletInfo.classList.remove("hidden");
+                    document.getElementById("mobile-connect-btn").textContent = "Connected";
+                }
+            }
+        }
+
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('active');
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            
+            if (!mobileMenu.contains(event.target) && !mobileMenuBtn.contains(event.target)) {
+                mobileMenu.classList.remove('active');
+            }
+        });
+
+        // Airdrop modal handling
+        document.getElementById('airdrop-btn').addEventListener('click', function() {
+            document.getElementById('airdrop-modal').classList.add('active');
+        });
+
+        document.getElementById('modal-close').addEventListener('click', function() {
+            document.getElementById('airdrop-modal').classList.remove('active');
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('airdrop-modal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                this.classList.remove('active');
+            }
+        });
+
+        // Fetch leaderboard data
+        async function fetchLeaderboard() {
+            const tbody = document.getElementById('leaderboard-body');
+            
+            try {
+                const response = await fetch('/api/leaderboard');
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to fetch leaderboard');
+                }
+
+                const leaderboard = await response.json();
+                console.log('Leaderboard data:', leaderboard);
+                
+                // Sort by points instead of totalTokens
+                const sortedLeaderboard = leaderboard.map(entry => ({
+                    ...entry,
+                    points: (entry.classicTokens * 100) + (entry.infectedTokens * 200)
+                })).sort((a, b) => b.points - a.points);
+                
+                if (sortedLeaderboard.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="3" class="no-data">No players yet. Create tokens or play games to get on the leaderboard!</td></tr>';
+                    return;
+                }
+
+                // Clear loading message
+                tbody.innerHTML = '';
+
+                // Render leaderboard entries
+                sortedLeaderboard.forEach((entry, index) => {
+                    const rank = index + 1;
+                    const rankClass = rank <= 3 ? `rank-${rank}` : '';
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><span class="rank ${rankClass}">#${rank}</span></td>
+                        <td class="wallet-address">${entry.wallet.slice(0, 6)}...${entry.wallet.slice(-4)}</td>
+                        <td class="points">${entry.points}</td>
+                    `;
+                    
+                    // Highlight current user's row
+                    if (userWallet && entry.wallet === userWallet) {
+                        row.style.background = 'rgba(0, 255, 0, 0.1)';
+                    }
+                    
+                    tbody.appendChild(row);
+                });
+                
+                // Remove any borders that might have been added
+                setTimeout(() => {
+                    const cells = document.querySelectorAll('#leaderboard-table td, #leaderboard-table th');
+                    cells.forEach(cell => {
+                        cell.style.border = 'none';
+                        cell.style.boxShadow = 'none';
+                    });
+                }, 0);
+                
+            } catch (error) {
+                console.error('Error fetching leaderboard:', error);
+                tbody.innerHTML = `<tr><td colspan="3" class="no-data">Error: ${error.message}</td></tr>`;
+            }
+        }
+
+        // Connect wallet
+        async function connectWallet() {
+            try {
+                if (!window.solana) {
+                    alert("Please install Phantom wallet");
+                    window.open("https://phantom.app/", "_blank");
+                    return;
+                }
+
+                const response = await window.solana.connect();
+                userWallet = response.publicKey.toString();
+                
+                // Save to localStorage
+                localStorage.setItem('userWallet', userWallet);
+                
+                updateWalletUI();
+                
+                // Refresh leaderboard to highlight user's position
+                fetchLeaderboard();
+
+            } catch (error) {
+                console.error("Connection error:", error);
+                alert("Failed to connect wallet");
+            }
+        }
+
+        document.getElementById('connect-btn').addEventListener('click', connectWallet);
+        document.getElementById('mobile-connect-btn').addEventListener('click', connectWallet);
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            createMatrixRain();
+            
+            // Check saved wallet
+            if (userWallet) {
+                updateWalletUI();
+            }
+            
+            fetchLeaderboard();
+            
+            // Remove any table borders that might still exist
+            const removeBorders = () => {
+                const table = document.getElementById('leaderboard-table');
+                if (table) {
+                    table.style.border = 'none';
+                    table.style.boxShadow = 'none';
+                    const cells = table.querySelectorAll('td, th');
+                    cells.forEach(cell => {
+                        cell.style.border = 'none';
+                        cell.style.boxShadow = 'none';
+                    });
+                }
+            };
+            
+            // Run immediately and after a delay to catch any late styling
+            removeBorders();
+            setTimeout(removeBorders, 100);
+            
+            // Refresh every 30 seconds
+            setInterval(fetchLeaderboard, 30000);
+        });
+    </script>
+</body>
+</html>
