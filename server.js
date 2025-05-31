@@ -36,15 +36,18 @@ let userStats = {};
 let recentInfectedNames = [];
 const MAX_RECENT_NAMES = 100; // Keep track of last 100 names
 
-// Data directory configuration for Render
-const dataDir = process.env.RENDER ? '/tmp/data' : path.join(__dirname, 'data');
+// Data directory configuration for Render with persistent disk
+const dataDir = process.env.RENDER 
+    ? process.env.PERSISTENT_DISK_PATH || '/var/data'  // Use persistent disk path
+    : path.join(__dirname, 'data');
+
 const TOKENS_FILE = path.join(dataDir, 'diskfun-tokens.json');
 const STATS_FILE = path.join(dataDir, 'user-stats.json');
 
 // Create data folder if it doesn't exist
 if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true });
-    console.log('Created data folder');
+    fs.mkdirSync(dataDir, { recursive: true, mode: 0o755 });
+    console.log('Created data folder at:', dataDir);
 }
 
 // Load saved tokens
@@ -652,9 +655,24 @@ function processImageUrl(url) {
     return url;
 }
 
-// Health check endpoint for Render
+// Health check endpoint for Render with persistence info
 app.get("/health", (req, res) => {
-    res.status(200).json({ status: "ok", message: "disk.fun is running" });
+    const persistentDiskAvailable = process.env.PERSISTENT_DISK_PATH ? true : false;
+    
+    res.status(200).json({ 
+        status: "ok", 
+        message: "disk.fun is running",
+        dataLocation: dataDir,
+        persistentStorage: persistentDiskAvailable,
+        tokenCount: diskfunTokens.length,
+        userCount: Object.keys(userStats).length,
+        diskPath: process.env.PERSISTENT_DISK_PATH || 'Not configured',
+        dataExists: {
+            directory: fs.existsSync(dataDir),
+            tokens: fs.existsSync(TOKENS_FILE),
+            stats: fs.existsSync(STATS_FILE)
+        }
+    });
 });
 
 // Start server
@@ -666,4 +684,6 @@ app.listen(PORT, '0.0.0.0', () => {
     console.log(`🦠 Infected GIFs served from: ${path.join(__dirname, 'ic')}`);
     console.log(`📝 Recent infected names: ${recentInfectedNames.length}`);
     console.log(`🌐 Environment: ${process.env.RENDER ? 'Render' : 'Local'}`);
+    console.log(`💾 Data location: ${dataDir}`);
+    console.log(`💾 Persistent storage: ${process.env.PERSISTENT_DISK_PATH ? 'ENABLED' : 'DISABLED'}`);
 });
