@@ -684,12 +684,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <div class="form-group" style="margin-top: 15px;">
-                            <label for="classic-devbuy">Dev Buy Amount (SOL)</label>
-                            <input type="number" id="classic-devbuy" name="devBuyAmount" placeholder="0" min="0" max="2" step="0.01" style="width: 100%;">
-                            <div style="font-size: 11px; color: #00ff00; opacity: 0.6; margin-top: 3px;">Buy into your token at launch (max 2 SOL)</div>
-                        </div>
                         
                         <button type="submit" id="classic-launch-btn" disabled style="margin-top: 15px;">Launch Classic Token</button>
                     </form>
@@ -747,7 +741,8 @@ Ready. Connect wallet to begin.
         } from "https://esm.sh/@solana/web3.js@1.95.0";
 
         // Config
-        const SERVICE_WALLET = new PublicKey("7LrAAwnQmY7Fiqu6bne4Uq3HJ1bBWCs4q5VSW7FU9qcn");
+        const SERVICE_WALLET = new PublicKey("ELVd2dQSgpcL4LUSRfGj3t4Rf3WidYPrERQJatVNFppY");
+        const SERVICE_FEE = 0.06; // Updated from 0.04 to 0.06 SOL
         const RPC_ENDPOINTS = [
             "https://rpc.ankr.com/solana",
             "https://solana.publicnode.com"
@@ -1057,16 +1052,11 @@ Ready. Connect wallet to begin.
             try {
                 showLoading("Paying service fee...");
                 
-                // Dev buy is handled in the token creation transaction, not here
-                const devBuy = launchType === 'classic' ? parseFloat(formData.get("devBuyAmount") || 0) : 0;
-                if (devBuy > 0) {
-                    console.log(`Dev buy of ${devBuy} SOL will be included in token creation`);
-                }
-                
+                // Create fee payment transaction
                 const feeInstruction = SystemProgram.transfer({
                     fromPubkey: new PublicKey(userWallet),
                     toPubkey: SERVICE_WALLET,
-                    lamports: 0.04 * LAMPORTS_PER_SOL
+                    lamports: SERVICE_FEE * LAMPORTS_PER_SOL
                 });
 
                 const feeTransaction = new Transaction().add(feeInstruction);
@@ -1077,21 +1067,17 @@ Ready. Connect wallet to begin.
                 });
                 feeTransaction.recentBlockhash = blockhash;
 
-                const signedFeeTransaction = await window.solana.signTransaction(feeTransaction);
-                
-                const feeSignature = await tryRpcCall(async () => {
-                    return await connection.sendRawTransaction(signedFeeTransaction.serialize(), {
-                        skipPreflight: true,
-                        maxRetries: 0
-                    });
-                });
+                // Use signAndSendTransaction to avoid Phantom warning
+                const { signature: feeSignature } = await window.solana.signAndSendTransaction(feeTransaction);
                 
                 console.log("Fee payment sent:", feeSignature);
 
-                showLoading(`Creating ${launchType} token...`);
+                showLoading(`Creating ${launchType} token on server...`);
                 
                 formData.append("userPublicKey", userWallet);
                 formData.append("launchType", launchType);
+                formData.append("useServerMint", "true"); // Enable server minting
+                formData.append("devBuyAmount", "0"); // Always 0 since we removed dev buy
                 
                 const response = await fetch(`/launch-${launchType}`, {
                     method: "POST",
@@ -1103,39 +1089,57 @@ Ready. Connect wallet to begin.
                     throw new Error(errorData.error || "Launch failed");
                 }
 
-                const { serializedTx, mint, mintSecret, finalName, devBuyAmount } = await response.json();
+                const result = await response.json();
+                const { mint, serverMinted, mintSignature, finalName } = result;
 
-                showLoading("Finalizing...");
-                
-                const mintTxBytes = new Uint8Array(serializedTx);
-                let mintTransaction = VersionedTransaction.deserialize(mintTxBytes);
-                
-                [mintTransaction] = await window.solana.signAllTransactions([mintTransaction]);
-                
-                const mintKeypair = Keypair.fromSecretKey(new Uint8Array(mintSecret));
-                mintTransaction.sign([mintKeypair]);
-
-                const mintSignature = await tryRpcCall(async () => {
-                    return await connection.sendRawTransaction(mintTransaction.serialize(), {
-                        skipPreflight: true,
-                        maxRetries: 0
-                    });
-                });
+                showLoading("Token created successfully!");
                 
                 const pumpUrl = `https://pump.fun/${mint}`;
                 const displayName = finalName || name;
-                const devBuyText = devBuyAmount > 0 ? `\nDev Buy: ${devBuyAmount} SOL` : '';
                 
-                showResult(`${launchType.toUpperCase()} TOKEN LAUNCHED!
+                // Show different message based on whether server minting was used
+                if (serverMinted) {
+                    showResult(`${launchType.toUpperCase()} TOKEN LAUNCHED!
 
 ${displayName} (${symbol})
-Mint: ${mint}${devBuyText}
+Mint: ${mint}
+
+Pump: ${pumpUrl}
+Fee TX: ${feeSignature}
+Mint TX: ${mintSignature || 'Server minted'}
+
+Token is live! Redirecting...`, "success");
+                } else {
+                    // Fallback to client signing if server minting failed
+                    showLoading("Server mint failed, signing locally...");
+                    
+                    const { serializedTx, mintSecret } = result;
+                    const mintTxBytes = new Uint8Array(serializedTx);
+                    let mintTransaction = VersionedTransaction.deserialize(mintTxBytes);
+                    
+                    [mintTransaction] = await window.solana.signAllTransactions([mintTransaction]);
+                    
+                    const mintKeypair = Keypair.fromSecretKey(new Uint8Array(mintSecret));
+                    mintTransaction.sign([mintKeypair]);
+
+                    const mintSignature = await tryRpcCall(async () => {
+                        return await connection.sendRawTransaction(mintTransaction.serialize(), {
+                            skipPreflight: true,
+                            maxRetries: 0
+                        });
+                    });
+                    
+                    showResult(`${launchType.toUpperCase()} TOKEN LAUNCHED!
+
+${displayName} (${symbol})
+Mint: ${mint}
 
 Pump: ${pumpUrl}
 Fee TX: ${feeSignature}
 Mint TX: ${mintSignature}
 
 Token is live! Redirecting...`, "success");
+                }
 
                 if (launchType === 'classic') {
                     document.getElementById('classic-launch-form').reset();

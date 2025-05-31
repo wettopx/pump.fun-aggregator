@@ -12,6 +12,12 @@ dotenv.config();
 const app = express();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+// Check if server minting is enabled
+const SERVER_MINT_ENABLED = process.env.SERVER_MINT_ENABLED === 'true' && 
+                           process.env.SERVER_MINT_PRIVATE_KEY;
+
+console.log(`Server mint mode: ${SERVER_MINT_ENABLED ? 'ENABLED' : 'DISABLED'}`);
+
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -466,22 +472,20 @@ app.get("/api/leaderboard", (req, res) => {
 // Classic launch endpoint
 app.post("/launch-classic", upload.single("image"), async (req, res) => {
     try {
-        const { name, symbol, userPublicKey, twitter, telegram, website, devBuyAmount } = req.body;
+        const { name, symbol, userPublicKey, twitter, telegram, website, devBuyAmount, useServerMint } = req.body;
         
         if (!name || !symbol || !userPublicKey || !req.file) {
             return res.status(400).json({ error: "Missing required fields" });
         }
         
-        // Parse dev buy amount
-        const buyAmount = devBuyAmount ? parseFloat(devBuyAmount) : 0;
-        if (buyAmount > 2) {
-            return res.status(400).json({ error: "Dev buy amount cannot exceed 2 SOL" });
-        }
+        // Parse dev buy amount (always 0 now since feature is removed)
+        const buyAmount = 0;
+        
+        // Check if server minting should be used
+        const shouldUseServerMint = useServerMint === "true" && SERVER_MINT_ENABLED;
         
         console.log(`Launching CLASSIC ${name} (${symbol}) for ${userPublicKey}`);
-        if (buyAmount > 0) {
-            console.log(`With dev buy: ${buyAmount} SOL`);
-        }
+        console.log(`Server mint: ${shouldUseServerMint ? 'YES' : 'NO'}`);
         
         // Prepare socials object
         const socials = {};
@@ -489,8 +493,8 @@ app.post("/launch-classic", upload.single("image"), async (req, res) => {
         if (telegram) socials.telegram = telegram;
         if (website) socials.website = website;
         
-        // Pass the buffer, socials, and dev buy amount
-        const result = await buildMintTx(name, symbol, req.file.buffer, userPublicKey, 'classic', socials, buyAmount);
+        // Pass the buffer, socials, dev buy amount (0), and server mint flag
+        const result = await buildMintTx(name, symbol, req.file.buffer, userPublicKey, 'classic', socials, 0, shouldUseServerMint);
         
         // Store disk.fun token
         const newToken = {
@@ -502,7 +506,7 @@ app.post("/launch-classic", upload.single("image"), async (req, res) => {
             createdAt: new Date().toISOString(),
             imageUrl: null, // Will be updated when token is live
             socials: socials,
-            devBuyAmount: buyAmount
+            serverMinted: result.serverMinted || false
         };
         
         diskfunTokens.unshift(newToken);
@@ -535,14 +539,19 @@ app.post("/launch-classic", upload.single("image"), async (req, res) => {
 // Infected launch endpoint
 app.post("/launch-infected", upload.single("image"), async (req, res) => {
     try {
-        const { name, symbol, userPublicKey, randomInfected } = req.body;
+        const { name, symbol, userPublicKey, randomInfected, useServerMint } = req.body;
         
         if (!name || !symbol || !userPublicKey) {
             return res.status(400).json({ error: "Missing required fields" });
         }
         
+        // Check if server minting should be used
+        const shouldUseServerMint = useServerMint === "true" && SERVER_MINT_ENABLED;
+        
         console.log(`Launching RANDOM INFECTED ${name} (${symbol}) for ${userPublicKey}`);
-        const result = await buildMintTx(name, symbol, null, userPublicKey, 'infected');
+        console.log(`Server mint: ${shouldUseServerMint ? 'YES' : 'NO'}`);
+        
+        const result = await buildMintTx(name, symbol, null, userPublicKey, 'infected', {}, 0, shouldUseServerMint);
         
         // Add the name to recent infected names list
         recentInfectedNames.push(result.finalName || name);
@@ -559,7 +568,8 @@ app.post("/launch-infected", upload.single("image"), async (req, res) => {
             isInfected: true,
             creator: userPublicKey,
             createdAt: new Date().toISOString(),
-            imageUrl: null // Will be updated when token is live
+            imageUrl: null, // Will be updated when token is live
+            serverMinted: result.serverMinted || false
         };
         
         diskfunTokens.unshift(newToken);
