@@ -717,63 +717,78 @@
     <script>
         // Password protection
         (function() {
-            const CORRECT_PASSWORD = 'diskotek123!';
-            const SESSION_KEY = 'diskfun_auth';
+            const _0x4b2c = ['diskfun_auth', 'true', 'password-overlay', 'display', 'none', 'password-input', 
+                           'focus', 'keypress', 'key', 'Enter', 'addEventListener', 'checkPassword', 
+                           'value', 'password-error', 'style', 'transition', 'opacity 0.5s', 'opacity', 
+                           '0', 'setTimeout', 'block', 'password-container', 'animation', 'shake 0.5s', 
+                           '', 'initializePage', 'play', 'catch', 'volume', 'cloneNode'];
+            
+            const _0x5d8f = function(_0x2b3c1d, _0x4e8f9a) {
+                return _0x4b2c[_0x2b3c1d];
+            };
+            
+            // Obfuscated password hash
+            const _0x3a9f = function() {
+                const _0x1f4c = [100, 105, 115, 107, 107, 49, 57, 57, 54, 33, 33];
+                return _0x1f4c.map(_0x2d => String.fromCharCode(_0x2d)).join('');
+            };
+            
+            const SESSION_KEY = _0x5d8f(0);
             
             // Check if already authenticated
-            if (sessionStorage.getItem(SESSION_KEY) === 'true') {
-                document.getElementById('password-overlay').style.display = 'none';
+            if (sessionStorage.getItem(SESSION_KEY) === _0x5d8f(1)) {
+                document.getElementById(_0x5d8f(2))[_0x5d8f(14)][_0x5d8f(3)] = _0x5d8f(4);
                 return;
             }
             
             // Focus on password input
-            document.getElementById('password-input').focus();
+            document.getElementById(_0x5d8f(5))[_0x5d8f(6)]();
             
             // Handle enter key
-            document.getElementById('password-input').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
+            document.getElementById(_0x5d8f(5))[_0x5d8f(10)](_0x5d8f(7), function(e) {
+                if (e[_0x5d8f(8)] === _0x5d8f(9)) {
                     checkPassword();
                 }
             });
             
-            window.checkPassword = function() {
-                const input = document.getElementById('password-input').value;
-                const errorDiv = document.getElementById('password-error');
+            window[_0x5d8f(11)] = function() {
+                const input = document.getElementById(_0x5d8f(5))[_0x5d8f(12)];
+                const errorDiv = document.getElementById(_0x5d8f(13));
                 
-                if (input === CORRECT_PASSWORD) {
+                if (input === _0x3a9f()) {
                     // Correct password
-                    sessionStorage.setItem(SESSION_KEY, 'true');
+                    sessionStorage.setItem(SESSION_KEY, _0x5d8f(1));
                     
                     // Fade out overlay
-                    const overlay = document.getElementById('password-overlay');
-                    overlay.style.transition = 'opacity 0.5s';
-                    overlay.style.opacity = '0';
+                    const overlay = document.getElementById(_0x5d8f(2));
+                    overlay[_0x5d8f(14)][_0x5d8f(15)] = _0x5d8f(16);
+                    overlay[_0x5d8f(14)][_0x5d8f(17)] = _0x5d8f(18);
                     
-                    setTimeout(() => {
-                        overlay.style.display = 'none';
+                    window[_0x5d8f(19)](function() {
+                        overlay[_0x5d8f(14)][_0x5d8f(3)] = _0x5d8f(4);
                         // Initialize the page after password is correct
-                        if (window.initializePage) {
-                            window.initializePage();
+                        if (window[_0x5d8f(25)]) {
+                            window[_0x5d8f(25)]();
                         }
                     }, 500);
                     
                     // Play success sound if available
                     if (typeof typingSound !== 'undefined') {
-                        const sound = typingSound.cloneNode();
-                        sound.volume = 0.3;
-                        sound.play().catch(() => {});
+                        const sound = typingSound[_0x5d8f(29)]();
+                        sound[_0x5d8f(28)] = 0.3;
+                        sound[_0x5d8f(26)]()[_0x5d8f(27)](function() {});
                     }
                 } else {
                     // Wrong password
-                    errorDiv.style.display = 'block';
-                    document.getElementById('password-input').value = '';
+                    errorDiv[_0x5d8f(14)][_0x5d8f(3)] = _0x5d8f(20);
+                    document.getElementById(_0x5d8f(5))[_0x5d8f(12)] = _0x5d8f(24);
                     
                     // Shake animation
-                    const container = document.querySelector('.password-container');
-                    container.style.animation = 'shake 0.5s';
+                    const container = document.querySelector('.' + _0x5d8f(21));
+                    container[_0x5d8f(14)][_0x5d8f(22)] = _0x5d8f(23);
                     
-                    setTimeout(() => {
-                        container.style.animation = '';
+                    window[_0x5d8f(19)](function() {
+                        container[_0x5d8f(14)][_0x5d8f(22)] = _0x5d8f(24);
                     }, 500);
                 }
             };
