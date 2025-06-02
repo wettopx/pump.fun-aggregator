@@ -956,6 +956,15 @@
                 const newTokensData = await response.json();
                 console.log(`Fetched ${newTokensData.length} disk.fun tokens`);
                 
+                // Enable debug mode to see all token addresses in console
+                const DEBUG_MODE = false; // Set to true to see token details
+                if (DEBUG_MODE) {
+                    console.log('Token list (for finding addresses to blacklist):');
+                    newTokensData.forEach(token => {
+                        console.log(`${token.name} - Mint: ${token.mint} - Creator: ${token.creator}`);
+                    });
+                }
+                
                 // Update the global tokens data immediately
                 tokensData = newTokensData;
                 
@@ -1075,7 +1084,23 @@
             const container = document.getElementById('tokens-grid');
             container.innerHTML = '';
 
-            let filteredTokens = [...tokensData];
+            // BLACKLISTED TOKENS - Add contract addresses here to hide them
+            const blacklistedTokens = [
+                "DmXucg6wKfyYFVPQtKwAU2zwJUaQ761itFcGJRi2yUTa",
+                "6Mf6NTet2CR8yzwkaY7WaoVfNSQFm2xTSzzUTRYBociZ",
+            ];
+
+            // BLACKLISTED CREATORS - Add wallet addresses that created fake tokens
+            const blacklistedCreators = [
+                // Add creator wallet addresses here
+                // Example: "FakeCreatorWalletAddress1234567890",
+            ];
+
+            // Filter out blacklisted tokens and creators
+            let filteredTokens = [...tokensData].filter(token => 
+                !blacklistedTokens.includes(token.mint) && 
+                !blacklistedCreators.includes(token.creator)
+            );
 
             // Apply filters
             const searchTerm = document.getElementById('search-input').value.toLowerCase();

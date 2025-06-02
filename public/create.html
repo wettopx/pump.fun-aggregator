@@ -1091,8 +1091,6 @@ Ready. Connect wallet to begin.
 
                 const result = await response.json();
                 const { mint, serverMinted, mintSignature, finalName } = result;
-
-                showLoading("Token created successfully!");
                 
                 const pumpUrl = `https://pump.fun/${mint}`;
                 const displayName = finalName || name;
