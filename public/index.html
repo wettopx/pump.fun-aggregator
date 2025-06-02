@@ -29,102 +29,6 @@
             overflow-x: hidden;
         }
 
-        /* Password Protection Styles */
-        #password-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #000000;
-            z-index: 99999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .password-container {
-            background: #000000;
-            border: 2px solid #00ff00;
-            padding: 40px;
-            text-align: center;
-            max-width: 400px;
-            width: 90%;
-            box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
-        }
-
-        .password-title {
-            color: #00ff00;
-            font-family: 'Courier New', monospace;
-            font-size: 24px;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .password-subtitle {
-            color: #00ff00;
-            font-family: 'Sora', sans-serif;
-            font-size: 14px;
-            margin-bottom: 20px;
-            opacity: 0.8;
-        }
-
-        #password-input {
-            width: 100%;
-            padding: 12px;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid #00ff00;
-            color: #00ff00;
-            font-family: 'Courier New', monospace;
-            font-size: 16px;
-            text-align: center;
-            margin-bottom: 20px;
-            box-shadow: none;
-            outline: none;
-        }
-
-        #password-input:focus {
-            background: rgba(0, 0, 0, 0.7);
-            border-color: #00ff00;
-            box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
-        }
-
-        #password-submit {
-            width: 100%;
-            padding: 12px;
-            background: #000000;
-            border: 1px solid #00ff00;
-            color: #00ff00;
-            font-family: 'Sora', sans-serif;
-            font-size: 16px;
-            font-weight: 500;
-            cursor: pointer;
-            text-transform: uppercase;
-            transition: all 0.3s;
-            box-shadow: none;
-            outline: none;
-        }
-
-        #password-submit:hover {
-            background: #00ff00;
-            color: #000000;
-        }
-
-        .password-error {
-            color: #ff0000;
-            font-family: 'Sora', sans-serif;
-            font-size: 12px;
-            margin-top: 15px;
-            display: none;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-            20%, 40%, 60%, 80% { transform: translateX(5px); }
-        }
-
         /* Matrix rain effect - simplified */
         #matrix-bg {
             position: fixed;
@@ -633,19 +537,6 @@
     </style>
 </head>
 <body translate="no">
-    <!-- Password Protection Overlay -->
-    <div id="password-overlay">
-        <div class="password-container">
-            <h1 class="password-title">ACCESS RESTRICTED</h1>
-            <div class="password-subtitle">Enter password to continue</div>
-            
-            <input type="password" id="password-input" placeholder="Enter password" autocomplete="off">
-            <button id="password-submit" onclick="checkPassword()">AUTHENTICATE</button>
-            
-            <div id="password-error" class="password-error">ACCESS DENIED - INCORRECT PASSWORD</div>
-        </div>
-    </div>
-
     <!-- Matrix Background -->
     <canvas id="matrix-bg"></canvas>
 
@@ -665,7 +556,7 @@
                     <a href="https://x.com/diskdotfun" target="_blank" rel="noopener noreferrer">
                         <img src="/x.svg" alt="Twitter" class="social-icon">
                     </a>
-                    <a href="https://discord.gg/diskfun" target="_blank" rel="noopener noreferrer">
+                    <a href="https://discord.gg/wA5G7BEa" target="_blank" rel="noopener noreferrer">
                         <img src="/dc.svg" alt="Discord" class="social-icon">
                     </a>
                 </div>
@@ -712,88 +603,6 @@
             <!-- Tokens will be loaded here -->
         </div>
     </div>
-
-    <!-- Password Protection Script (must be before module script) -->
-    <script>
-        // Password protection
-        (function() {
-            const _0x4b2c = ['diskfun_auth', 'true', 'password-overlay', 'display', 'none', 'password-input', 
-                           'focus', 'keypress', 'key', 'Enter', 'addEventListener', 'checkPassword', 
-                           'value', 'password-error', 'style', 'transition', 'opacity 0.5s', 'opacity', 
-                           '0', 'setTimeout', 'block', 'password-container', 'animation', 'shake 0.5s', 
-                           '', 'initializePage', 'play', 'catch', 'volume', 'cloneNode'];
-            
-            const _0x5d8f = function(_0x2b3c1d, _0x4e8f9a) {
-                return _0x4b2c[_0x2b3c1d];
-            };
-            
-            // Obfuscated password hash
-            const _0x3a9f = function() {
-                const _0x1f4c = [100, 105, 115, 107, 107, 49, 57, 57, 54, 33, 33];
-                return _0x1f4c.map(_0x2d => String.fromCharCode(_0x2d)).join('');
-            };
-            
-            const SESSION_KEY = _0x5d8f(0);
-            
-            // Check if already authenticated
-            if (sessionStorage.getItem(SESSION_KEY) === _0x5d8f(1)) {
-                document.getElementById(_0x5d8f(2))[_0x5d8f(14)][_0x5d8f(3)] = _0x5d8f(4);
-                return;
-            }
-            
-            // Focus on password input
-            document.getElementById(_0x5d8f(5))[_0x5d8f(6)]();
-            
-            // Handle enter key
-            document.getElementById(_0x5d8f(5))[_0x5d8f(10)](_0x5d8f(7), function(e) {
-                if (e[_0x5d8f(8)] === _0x5d8f(9)) {
-                    checkPassword();
-                }
-            });
-            
-            window[_0x5d8f(11)] = function() {
-                const input = document.getElementById(_0x5d8f(5))[_0x5d8f(12)];
-                const errorDiv = document.getElementById(_0x5d8f(13));
-                
-                if (input === _0x3a9f()) {
-                    // Correct password
-                    sessionStorage.setItem(SESSION_KEY, _0x5d8f(1));
-                    
-                    // Fade out overlay
-                    const overlay = document.getElementById(_0x5d8f(2));
-                    overlay[_0x5d8f(14)][_0x5d8f(15)] = _0x5d8f(16);
-                    overlay[_0x5d8f(14)][_0x5d8f(17)] = _0x5d8f(18);
-                    
-                    window[_0x5d8f(19)](function() {
-                        overlay[_0x5d8f(14)][_0x5d8f(3)] = _0x5d8f(4);
-                        // Initialize the page after password is correct
-                        if (window[_0x5d8f(25)]) {
-                            window[_0x5d8f(25)]();
-                        }
-                    }, 500);
-                    
-                    // Play success sound if available
-                    if (typeof typingSound !== 'undefined') {
-                        const sound = typingSound[_0x5d8f(29)]();
-                        sound[_0x5d8f(28)] = 0.3;
-                        sound[_0x5d8f(26)]()[_0x5d8f(27)](function() {});
-                    }
-                } else {
-                    // Wrong password
-                    errorDiv[_0x5d8f(14)][_0x5d8f(3)] = _0x5d8f(20);
-                    document.getElementById(_0x5d8f(5))[_0x5d8f(12)] = _0x5d8f(24);
-                    
-                    // Shake animation
-                    const container = document.querySelector('.' + _0x5d8f(21));
-                    container[_0x5d8f(14)][_0x5d8f(22)] = _0x5d8f(23);
-                    
-                    window[_0x5d8f(19)](function() {
-                        container[_0x5d8f(14)][_0x5d8f(22)] = _0x5d8f(24);
-                    }, 500);
-                }
-            };
-        })();
-    </script>
 
     <script type="module">
         import { Connection, PublicKey } from "https://esm.sh/@solana/web3.js@1.95.0";
@@ -1088,6 +897,14 @@
             const blacklistedTokens = [
                 "DmXucg6wKfyYFVPQtKwAU2zwJUaQ761itFcGJRi2yUTa",
                 "6Mf6NTet2CR8yzwkaY7WaoVfNSQFm2xTSzzUTRYBociZ",
+                "78MVVajjRKqjCLfyRQ4BAu1S4AzLiPb1nSnUWEKeJ75K",
+                "H8Ssdm7LvzRtRdYr58dS6UEiMhDrdSb8TPNWEHvB7ypM",
+                "4G1Q55RfweTyBwAbrxrbY6joNxp6xs3EFprpiC3i7Cza",
+                "tj9whvkea9yTnBK3UVrc1tHz2rz8UmD6nJ7LvHxnFjb",
+                "D1SYH1x798eC849w1oCCbKXXUMsmsieUUnhB4VcjYVBP",
+                "5eNHTFiF7QTJ2hJW7yhdujcb4c6aKRm3h1DSEtARorsF",
+                "QCxhiUkmG6uepfq3GMApyRrAT57RD8Zit6fRuLZPkUC",
+                "F1fNEfMa9sHHCFQjsTjEskqaKhaUELX3WNEVEcuFWF3T",
             ];
 
             // BLACKLISTED CREATORS - Add wallet addresses that created fake tokens
@@ -1273,8 +1090,24 @@
         document.getElementById('connect-btn').addEventListener('click', handleWallet);
         document.getElementById('mobile-connect-btn').addEventListener('click', handleWallet);
 
-        // Initialize page function
-        function initializePage() {
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('active');
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            
+            if (!mobileMenu.contains(event.target) && !mobileMenuBtn.contains(event.target)) {
+                mobileMenu.classList.remove('active');
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
             createMatrixRain();
             showIntro();
             
@@ -1287,18 +1120,7 @@
             
             // Refresh every 30 seconds
             setInterval(() => fetchTokens(false), 30000);
-        }
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            // Only initialize if already authenticated
-            if (sessionStorage.getItem('diskfun_auth') === 'true') {
-                initializePage();
-            }
         });
-        
-        // Make initializePage available globally for password check
-        window.initializePage = initializePage;
     </script>
 </body>
 </html>
