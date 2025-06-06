@@ -1030,26 +1030,26 @@ Ready. Connect wallet to begin.
 
         // Launch token function
         async function launchToken(formData, launchType) {
-            const name = formData.get("name").trim();
-            const symbol = formData.get("symbol").trim();
-            const image = formData.get("image");
-
-            if (!name || !symbol) {
-                showResult("Missing token data!", "error");
-                return;
-            }
-
-            if (launchType === 'classic' && (!image || image.size === 0)) {
-                showResult("Please select an image!", "error");
-                return;
-            }
-
-            if (launchType === 'classic' && image.size > 5 * 1024 * 1024) {
-                showResult("Image too large (max 5MB)!", "error");
-                return;
-            }
-
             try {
+                const name = formData.get("name")?.trim();
+                const symbol = formData.get("symbol")?.trim();
+                const image = formData.get("image");
+
+                if (!name || !symbol) {
+                    showResult("Missing token data!", "error");
+                    return;
+                }
+
+                if (launchType === 'classic' && (!image || image.size === 0)) {
+                    showResult("Please select an image!", "error");
+                    return;
+                }
+
+                if (launchType === 'classic' && image.size > 5 * 1024 * 1024) {
+                    showResult("Image too large (max 5MB)!", "error");
+                    return;
+                }
+
                 showLoading("Paying service fee...");
                 
                 // Create fee payment transaction
@@ -1096,7 +1096,7 @@ Ready. Connect wallet to begin.
                 const displayName = finalName || name;
                 
                 // Show different message based on whether server minting was used
-                if (serverMinted) {
+                if (serverMinted && mintSignature) {
                     showResult(`${launchType.toUpperCase()} TOKEN LAUNCHED!
 
 ${displayName} (${symbol})
@@ -1104,7 +1104,18 @@ Mint: ${mint}
 
 Pump: ${pumpUrl}
 Fee TX: ${feeSignature}
-Mint TX: ${mintSignature || 'Server minted'}
+Mint TX: ${mintSignature}
+
+Token is live! Redirecting...`, "success");
+                } else if (serverMinted) {
+                    // Server minted but no signature returned (still successful)
+                    showResult(`${launchType.toUpperCase()} TOKEN LAUNCHED!
+
+${displayName} (${symbol})
+Mint: ${mint}
+
+Pump: ${pumpUrl}
+Fee TX: ${feeSignature}
 
 Token is live! Redirecting...`, "success");
                 } else {
@@ -1156,7 +1167,18 @@ Token is live! Redirecting...`, "success");
                 }, 5000);
 
             } catch (error) {
-                showResult(`${launchType} launch failed: ${error.message}`, "error");
+                console.error(`${launchType} launch error:`, error);
+                
+                // More specific error messages
+                if (error.message.includes('User rejected')) {
+                    showResult("Transaction cancelled by user", "error");
+                } else if (error.message.includes('insufficient')) {
+                    showResult("Insufficient SOL balance for fees", "error");
+                } else if (error.message.includes('network')) {
+                    showResult("Network error. Please try again", "error");
+                } else {
+                    showResult(`${launchType} launch failed: ${error.message}`, "error");
+                }
             } finally {
                 // Always reset infected token generation on error or success
                 if (launchType === 'infected') {

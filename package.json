@@ -24,7 +24,12 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "keywords": ["solana", "pump.fun", "token", "launcher"],
+  "keywords": [
+    "solana",
+    "pump.fun",
+    "token",
+    "launcher"
+  ],
   "author": "Disk.fun",
   "license": "MIT"
 }
