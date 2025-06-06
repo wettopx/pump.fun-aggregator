@@ -1,216 +1,306 @@
 # pump.fun aggregator
 
-pump.fun aggregator is an open-source web-based tool designed to track and analyze memecoin launches on [pump.fun](https://pump.fun), a popular token launch platform on Solana. This project aggregates real-time token data and surfaces useful insights such as token metadata, launch information, and detection of potentially "infected" or suspicious launches.
-
-It serves as a community resource for degens, meme token hunters, and Solana enthusiasts looking to stay ahead of the chaos in the pump.fun ecosystem.
-
----
+An open-source aggregator for the pump.fun launchpad platform on Solana blockchain. This tool provides comprehensive data aggregation, analytics, and monitoring capabilities for tokens launched on pump.fun.
 
 ## Table of Contents
 
+- [Overview](#overview)
 - [Features](#features)
-- [Tech Stack](#tech-stack)
-- [File Structure](#file-structure)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Infected Token Detection](#infected-token-detection)
-- [Customization](#customization)
-- [Deployment](#deployment)
-- [Roadmap](#roadmap)
+- [Configuration](#configuration)
+- [API Reference](#api-reference)
+- [Architecture](#architecture)
 - [Contributing](#contributing)
 - [License](#license)
 - [Disclaimer](#disclaimer)
-- [Author](#author)
 
----
+## Overview
+
+Pump.fun Aggregator is designed to help traders, developers, and analysts track and analyze tokens launched on the pump.fun platform. It aggregates data from multiple sources to provide real-time insights into token performance, market trends, and trading opportunities.
+
+### What is Pump.fun?
+
+Pump.fun is a Solana-based platform that allows users to create and trade memecoins without coding knowledge. Tokens can be traded immediately after creation and can "graduate" to decentralized exchanges like Raydium once they reach certain milestones.
 
 ## Features
 
-- ✅ **Token Aggregation**: Collects token metadata (name, symbol, image, creator, etc.) from pump.fun
-- ✅ **Infected Launch Detection**: Flags tokens launched by suspicious or known addresses using customizable logic
-- ✅ **Frontend Dashboard**: A lightweight web interface showing aggregated token launches in real time
-- ✅ **Modular Codebase**: Easily extendable with new rules, data sources, or visual themes
+### Core Functionality
 
----
+- **Real-time Token Tracking**: Monitor new token launches as they happen
+- **Market Data Aggregation**: Collect and display comprehensive market statistics
+- **Advanced Filtering**: Filter tokens by various parameters including:
+  - Market capitalization
+  - Volume
+  - Age
+  - Creator address
+  - Token name/symbol
+- **Sorting Options**: Sort tokens by multiple criteria for easy analysis
+- **Historical Data**: Track token performance over time
+- **Graduation Monitoring**: Track tokens that migrate to Raydium/other DEXs
 
-## Tech Stack
+### Analytics
 
-- **Backend**: Node.js + Express
-- **Frontend**: Vanilla HTML, CSS, and JavaScript
-- **Scripts**: Custom logic for processing and detecting infected tokens
-- **Data Source**: Public pump.fun token metadata endpoints (JSON)
+- **Price Charts**: Visual representation of token price movements
+- **Volume Analysis**: Trading volume trends and patterns
+- **Holder Distribution**: Analysis of token holder concentration
+- **Liquidity Metrics**: Track available liquidity and bonding curve progress
+- **Success Rate Tracking**: Monitor which tokens successfully graduate
 
----
+### Additional Features
 
-## File Structure
-
-```
-pump.fun-aggregator/
-├── public/                # Static web assets
-│   ├── index.html        # Main HTML file
-│   └── script.js         # JS for frontend behavior
-├── scripts/              # Background and data processing logic
-│   └── launch.js         # Infected token detection and token processing logic
-├── server/               # Backend helpers and data fetching
-│   └── fetch.js          # Pump.fun API data collector
-├── server.js             # Main Express server
-├── package.json          # Project dependencies and metadata
-└── README.md             # Project documentation
-```
-
----
+- **WebSocket Support**: Real-time data updates via WebSocket connections
+- **RESTful API**: Access aggregated data programmatically
+- **Export Functionality**: Export data in CSV/JSON formats
+- **Alert System**: Set up custom alerts for specific events
+- **Multi-wallet Support**: Track performance across multiple wallets
 
 ## Installation
 
 ### Prerequisites
 
-- Node.js v14 or higher
-- npm (comes with Node.js)
+- Node.js v16.0.0 or higher
+- npm or yarn package manager
+- Solana CLI tools (optional, for advanced features)
+- A Solana RPC endpoint (Helius, QuickNode, or similar)
 
-### Setup Steps
+### Clone the Repository
 
-1. **Clone the Repository**
-   ```bash
-   git clone https://github.com/wettopx/pump.fun-aggregator.git
-   cd pump.fun-aggregator
-   ```
+```bash
+git clone https://github.com/wettopx/pump.fun-aggregator.git
+cd pump.fun-aggregator
+```
 
-2. **Install Dependencies**
-   ```bash
-   npm install
-   ```
+### Install Dependencies
 
-3. **Start the Server**
-   ```bash
-   node server.js
-   ```
+```bash
+npm install
+# or
+yarn install
+```
 
-   This will launch the site on:
-   ```
-   http://localhost:3000
-   ```
+### Environment Setup
 
----
+Create a `.env` file in the root directory:
+
+```env
+# RPC Configuration
+SOLANA_RPC_URL=https://your-rpc-endpoint.com
+SOLANA_WS_URL=wss://your-websocket-endpoint.com
+
+# API Configuration
+API_PORT=3000
+API_KEY=your-api-key
+
+# Database Configuration (if applicable)
+DATABASE_URL=your-database-url
+
+# Optional: Analytics
+ENABLE_ANALYTICS=true
+ANALYTICS_INTERVAL=60000
+
+# Optional: Alerts
+ENABLE_ALERTS=true
+ALERT_WEBHOOK_URL=your-webhook-url
+```
 
 ## Usage
 
-After launching the server, open your browser and go to `http://localhost:3000`. The frontend will display a list of token launches from pump.fun.
-
-Each token entry may include:
-- Token name and symbol
-- Token image
-- Creator address
-- Launch time
-- Status (e.g., flagged as infected)
-
----
-
-## Infected Token Detection
-
-To detect suspicious or malicious tokens, the project uses the `scripts/launch.js` file. This file contains logic to analyze token launches and flag those created by known malicious addresses or matching specific behavioral patterns.
+### Starting the Aggregator
 
 ```bash
-node scripts/launch.js
+# Development mode
+npm run dev
+
+# Production mode
+npm run build
+npm start
 ```
 
-The script will fetch the latest token data and print information about any launches that match infection criteria.
+### Basic Usage Examples
 
-### How It Works
+#### Fetching Recent Tokens
 
-- The script compares each token's creator or metadata against a list of known traits (e.g., wallet blacklists, exploit signatures)
-- If a token meets the criteria, it is flagged as `infected`
-- This information can be used in the frontend for display or filtering
+```javascript
+const aggregator = require('pump.fun-aggregator');
 
-You can customize this logic in `scripts/launch.js` to improve detection based on your own risk signals or add support for automatic alerts.
+// Get recently launched tokens
+const recentTokens = await aggregator.getRecentTokens({
+  limit: 50,
+  timeframe: '1h'
+});
+```
 
----
+#### Filtering Tokens
 
-## Customization
+```javascript
+// Filter tokens by market cap
+const filteredTokens = await aggregator.filterTokens({
+  minMarketCap: 10000,
+  maxMarketCap: 1000000,
+  sortBy: 'marketCap',
+  order: 'desc'
+});
+```
 
-This repo is designed to be easily hackable and extendable:
+#### Setting Up Real-time Monitoring
 
-- Add additional data sources in `server/fetch.js`
-- Add filters or UI improvements to `public/script.js`
-- Improve infected detection logic in `scripts/launch.js`
-- Style the frontend by adding CSS to `public/index.html`
-- Deploy the app publicly via [Railway](https://railway.app), [Vercel](https://vercel.com), or any static host
+```javascript
+// Subscribe to new token launches
+aggregator.subscribeToNewTokens((token) => {
+  console.log('New token launched:', token);
+});
 
----
+// Subscribe to graduation events
+aggregator.subscribeToGraduations((event) => {
+  console.log('Token graduated:', event);
+});
+```
 
-## Deployment
+## Configuration
 
-To deploy the project on a public server, you can use any Node.js-compatible host:
+### Aggregator Settings
 
-### Railway (Recommended)
+Configuration options can be set in `config.json`:
 
-1. Push your project to GitHub
-2. Connect your GitHub repo to [Railway](https://railway.app/)
-3. Set your start command to: `node server.js`
-4. Railway will build and host the app automatically
+```json
+{
+  "aggregator": {
+    "updateInterval": 5000,
+    "batchSize": 100,
+    "retryAttempts": 3,
+    "cacheEnabled": true,
+    "cacheTTL": 300000
+  },
+  "filters": {
+    "minMarketCap": 1000,
+    "excludeRugged": true,
+    "onlyVerified": false
+  },
+  "alerts": {
+    "newTokenThreshold": 50000,
+    "volumeSpike": 10,
+    "priceChange": 50
+  }
+}
+```
 
-### Other Options
+## API Reference
 
-- Vercel (with serverless functions)
-- Heroku
-- Render
-- Your own VPS (e.g., DigitalOcean, AWS EC2)
+### REST Endpoints
 
----
+#### GET /api/tokens
+Retrieve a list of tokens with optional filtering
 
-## Roadmap
+**Query Parameters:**
+- `limit` (number): Maximum number of results
+- `offset` (number): Pagination offset
+- `sortBy` (string): Field to sort by
+- `order` (string): Sort order (asc/desc)
+- `minMarketCap` (number): Minimum market cap filter
+- `maxMarketCap` (number): Maximum market cap filter
 
-Planned or suggested enhancements:
+#### GET /api/tokens/:address
+Get detailed information about a specific token
 
-- [ ] Wallet tagging and scoring system
-- [ ] Sort tokens by time, market cap, volume
-- [ ] Telegram or Discord notifications for infected launches
-- [ ] Frontend filters (by status, time, symbol)
-- [ ] Export token logs as CSV or JSON
-- [ ] Add CSS styling for better UI/UX
-- [ ] Real-time WebSocket updates
-- [ ] Historical data tracking and analytics
+#### GET /api/stats
+Retrieve platform-wide statistics
 
----
+#### GET /api/trending
+Get trending tokens based on various metrics
+
+### WebSocket Events
+
+Connect to `ws://localhost:3000` for real-time updates:
+
+- `newToken`: Emitted when a new token is created
+- `tokenUpdate`: Emitted when token data is updated
+- `graduation`: Emitted when a token graduates to a DEX
+- `alert`: Custom alerts based on configured criteria
+
+## Architecture
+
+### System Components
+
+```
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│                 │     │                 │     │                 │
+│  Solana RPC     │────▶│   Aggregator    │────▶│   Database      │
+│                 │     │     Engine      │     │                 │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+                               │
+                               ▼
+                        ┌─────────────────┐
+                        │                 │
+                        │   API Server    │
+                        │                 │
+                        └─────────────────┘
+                               │
+                               ▼
+                        ┌─────────────────┐
+                        │                 │
+                        │    Clients      │
+                        │                 │
+                        └─────────────────┘
+```
+
+### Data Flow
+
+1. **Data Collection**: Continuously monitors Solana blockchain for pump.fun events
+2. **Processing**: Parses and normalizes transaction data
+3. **Storage**: Stores processed data in database (if configured)
+4. **API Layer**: Serves data through REST and WebSocket endpoints
+5. **Client Access**: Applications can consume data via API
 
 ## Contributing
 
-Contributions are welcome and encouraged. You can:
+We welcome contributions to the Pump.fun Aggregator project! Please follow these steps:
 
-- Open issues for bugs or feature requests
-- Fork the repo and submit a pull request
-- Add more detection rules or improve the UI
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-To contribute:
+### Development Guidelines
 
-```bash
-git checkout -b feature/your-feature-name
-# Make your changes
-git commit -m "Add your feature"
-git push origin feature/your-feature-name
-```
+- Follow the existing code style
+- Add tests for new features
+- Update documentation as needed
+- Ensure all tests pass before submitting PR
 
-Then open a pull request on GitHub.
+### Code of Conduct
 
----
+Please read our Code of Conduct before contributing to ensure a welcoming environment for all contributors.
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](https://github.com/wettopx/pump.fun-aggregator/blob/main/LICENSE) file for details.
-
----
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Disclaimer
 
-This project is not affiliated with pump.fun or its developers. It is provided as-is for research, educational, and community tracking purposes only.
+**Important Notice**: This software is provided for educational and informational purposes only. 
 
-Use at your own risk. Flagging of "infected" tokens is heuristic-based and may not be 100% accurate.
+- Not Financial Advice: This tool does not provide financial advice. Always do your own research.
+- Risk Warning: Trading cryptocurrencies and memecoins carries significant risk. You may lose all invested capital.
+- No Guarantees: We make no guarantees about the accuracy or completeness of the data provided.
+- Third-party Dependency: This tool depends on pump.fun and Solana network availability.
 
-**Always do your own research (DYOR) before investing in any memecoin or experimental token.**
+Use this software at your own risk. The developers are not responsible for any losses incurred through the use of this tool.
+
+## Support
+
+For support, please:
+- Check the [Issues](https://github.com/wettopx/pump.fun-aggregator/issues) page for known problems
+- Join our community discussions
+- Contact the maintainers
+
+## Acknowledgments
+
+- Pump.fun team for creating the platform
+- Solana community for blockchain infrastructure
+- Contributors who have helped improve this project
 
 ---
 
-## Author
-
-Developed and maintained by [wettopx](https://github.com/wettopx).
-
-For questions or suggestions, please open an issue on GitHub.
+Built with passion for the Solana ecosystem.
