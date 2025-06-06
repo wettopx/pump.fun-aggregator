@@ -1,4 +1,4 @@
-# pump.fun sggregator
+# pump.fun aggregator
 
 pump.fun aggregator is an open-source web-based tool designed to track and analyze memecoin launches on [pump.fun](https://pump.fun), a popular token launch platform on Solana. This project aggregates real-time token data and surfaces useful insights such as token metadata, launch information, and detection of potentially "infected" or suspicious launches.
 
